@@ -3,7 +3,7 @@
    (No backend, no keys in the page.) */
 (function () {
   // ▼▼▼ Apps Script Web app URL (ends in /exec) ▼▼▼
-  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwHwFCejTy2QDUfrJdPEKl5EkjuzPImoxZwbxqg0UffJHkfyWJdXDt-rW_V61xZvDuMCQ/exec';
+  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwxPCeQqORJQTRkaBd-ArjqR1cCbQefOtsXO_Ky2jDvrZ6LopVADY5_M9xzBVOKVvbA3A/exec';
   // ▲▲▲ until this is set, the teaser shows a placeholder and submit is disabled ▲▲▲
 
   // case-insensitive; accept both spellings. Apps Script (Code.gs) checks the same.
