@@ -1,7 +1,8 @@
 /* RSVP: client-side password gate (light gate — the server re-validates too),
    then POST the questionnaire to the /api/rsvp serverless function. */
 (function () {
-  var PASSWORD = 'bugershack'; // case-insensitive; server also checks RSVP_PASSWORD
+  // case-insensitive; accept both spellings. Server (api/rsvp.js) checks the same.
+  var PASSWORDS = ['burgershack', 'bugershack'];
 
   var gate = document.getElementById('gate');
   var gateBtn = document.getElementById('gate-btn');
@@ -13,7 +14,7 @@
   var submitBtn = document.getElementById('submit-btn');
 
   function unlock() {
-    if (pw.value.trim().toLowerCase() === PASSWORD) {
+    if (PASSWORDS.indexOf(pw.value.trim().toLowerCase()) !== -1) {
       gate.classList.add('hidden');
       form.classList.remove('hidden');
     } else {

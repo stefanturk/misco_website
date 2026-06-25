@@ -26,9 +26,10 @@ export default async function handler(req, res) {
   }
   body = body || {};
 
-  const expected = (process.env.RSVP_PASSWORD || 'bugershack').toLowerCase();
+  // Accept the env override plus both spellings of the default.
+  const accepted = [(process.env.RSVP_PASSWORD || 'burgershack').toLowerCase(), 'burgershack', 'bugershack'];
   const given = String(body.password || '').trim().toLowerCase();
-  if (given !== expected) {
+  if (accepted.indexOf(given) === -1) {
     res.status(401).send('Wrong password');
     return;
   }

@@ -39,4 +39,4 @@ The RSVP form POSTs to `api/rsvp.js`, which emails
 form will fail to send because there's no serverless function. Use `vercel dev` to
 test the email path.
 
-Password to view the RSVP form: **`bugershack`** (case-insensitive).
+Password to view the RSVP form: **`burgershack`** (case-insensitive).
