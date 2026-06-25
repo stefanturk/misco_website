@@ -25,7 +25,7 @@ The RSVP form reads/writes the guest sheet via a **Google Apps Script web app**
 bound to the spreadsheet — no server, no keys in the page, works on GitHub Pages.
 
 - Sheet: `docs.google.com/spreadsheets/d/1VyULOfevuiDQeHcziHghXR5Ec8lVVnWJjn4IvWAr4ns`
-- Columns (tab `RSVPs`): `Timestamp · Name · Bunk or Camping · Venmoed Alex · Arrival · Notes`
+- Columns (tab `RSVPs`): `Timestamp · Name · Email · Bunk or Camping · Venmo Handle · Arrival · Notes`
 - Script + deploy steps: **`apps-script/Code.gs`** (header comment).
 
 Setup:

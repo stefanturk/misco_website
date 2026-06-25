@@ -87,11 +87,16 @@
       return;
     }
 
+    // Venmo handle must start with @ — prepend it if they left it off.
+    var venmo = document.getElementById('venmo').value.trim();
+    if (venmo && venmo.charAt(0) !== '@') venmo = '@' + venmo;
+
     var data = {
       password: pw.value.trim(),
       name: document.getElementById('name').value.trim(),
+      email: document.getElementById('email').value.trim(),
       bunk: (form.elements.bunk.value || ''),
-      venmoed: (form.elements.venmoed.checked ? 'Yes' : 'No'),
+      venmo: venmo,
       arrival: (form.elements.arrival.value || '')
     };
 

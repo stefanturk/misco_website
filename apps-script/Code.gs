@@ -22,7 +22,7 @@
  */
 
 var SHEET_NAME = 'RSVPs';
-var HEADERS = ['Timestamp', 'Name', 'Bunk or Camping', 'Venmoed Alex', 'Arrival', 'Notes'];
+var HEADERS = ['Timestamp', 'Name', 'Email', 'Bunk or Camping', 'Venmo Handle', 'Arrival', 'Notes'];
 var PASSWORDS = ['burgershack', 'bugershack']; // accepted on submit; matches the website gate
 
 function getSheet_() {
@@ -51,8 +51,9 @@ function doPost(e) {
     getSheet_().appendRow([
       new Date(),
       name,
+      String(data.email || ''),
       String(data.bunk || ''),
-      String(data.venmoed || ''),
+      String(data.venmo || ''),
       String(data.arrival || ''),
       '' // Notes — left blank for you to fill in
     ]);
@@ -68,10 +69,11 @@ function doGet() {
   var last = sh.getLastRow();
   var guests = [];
   if (last > 1) {
-    var rows = sh.getRange(2, 1, last - 1, 5).getValues(); // Timestamp,Name,Bunk,Venmoed,Arrival
+    // Timestamp,Name,Email,Bunk,Venmo,Arrival (cols 0..5)
+    var rows = sh.getRange(2, 1, last - 1, 6).getValues();
     for (var i = 0; i < rows.length; i++) {
       var nm = String(rows[i][1] || '').trim();
-      if (nm) guests.push({ name: nm, arrival: String(rows[i][4] || '') });
+      if (nm) guests.push({ name: nm, arrival: String(rows[i][5] || '') });
     }
   }
   return json_({ count: guests.length, guests: guests });

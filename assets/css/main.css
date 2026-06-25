@@ -481,7 +481,7 @@ body::after {
 .teaser-empty { color: var(--muted); font-family: var(--font-mono); font-size: 0.8rem; }
 .teaser-list::-webkit-scrollbar { width: 6px; }
 .teaser-list::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--accent-1) 40%, transparent); border-radius: 3px; }
-.field input[type=text], .field input[type=password] {
+.field input[type=text], .field input[type=password], .field input[type=email] {
   width: 100%; padding: 0.85rem 1rem; font-family: var(--font-mono); font-size: 0.95rem;
   color: var(--text); background: rgba(0,0,0,0.3);
   border: 1px solid var(--line); border-radius: 3px; outline: none; transition: border-color .2s, box-shadow .2s;
