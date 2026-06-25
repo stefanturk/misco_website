@@ -94,7 +94,7 @@
   // Pre-build waves; hues filled by rebuildHues()
   const waves = Array.from({ length: 80 }, function (_, i) {
     var j = i % 9;
-    return { phase: i * 0.9, driftSpeed: 0.006 + j * 0.0015, amp: 9 + j * 2.5, hue: 320 };
+    return { phase: i * 0.9, driftSpeed: 0.006 + j * 0.0015, amp: 6 + j * 1.7, hue: 320 };
   });
 
   var ripples = [];

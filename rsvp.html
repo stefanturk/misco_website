@@ -37,7 +37,7 @@
 
     <!-- Questionnaire (hidden until unlocked) -->
     <form class="form-card hidden" id="rsvp-form">
-      <div class="notice cost"><strong>Heads up:</strong> the weekend costs <strong>$50</strong>.</div>
+      <div class="notice cost">Attendance is <strong>$50</strong> to help pay for the venue and the bands.</div>
 
       <!-- Live teaser: who's RSVP'd so far -->
       <div class="rsvp-teaser">
@@ -66,7 +66,7 @@
       </div>
 
       <div class="field">
-        <label for="venmo">Which Venmo paid Alex to lock in your spot?</label>
+        <label for="venmo">Need to venmo @alex-youngberg to lock in your spot. What venmo did you send it from?</label>
         <p class="field-hint">Starts with @ — e.g. @alex-youngberg. (Limited availability.)</p>
         <input type="text" id="venmo" name="venmo" required pattern="@.+" title="Your Venmo username, starting with @" placeholder="@your-venmo" />
       </div>
@@ -85,8 +85,12 @@
 
     <!-- Thank-you (hidden until submitted) -->
     <div class="thanks hidden" id="thanks">
-      <h2 class="neon" style="font-size:clamp(2rem,7vw,4rem)">See you there</h2>
-      <p class="lead center">Your RSVP is in. Don’t forget to Venmo <strong>@alex-youngberg</strong> to lock your spot.</p>
+      <h2 class="neon" style="font-size:clamp(2rem,7vw,4rem)">You're in!</h2>
+      <p class="lead center">Your RSVP is in! Here are the other homies going:</p>
+      <div class="rsvp-teaser" style="text-align:left;margin-top:1.6rem">
+        <div class="teaser-count" id="thanks-count"></div>
+        <ul class="teaser-list" id="thanks-list"></ul>
+      </div>
     </div>
   </main>
 

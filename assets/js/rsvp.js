@@ -19,6 +19,8 @@
   var submitBtn = document.getElementById('submit-btn');
   var teaserCount = document.getElementById('teaser-count');
   var teaserList = document.getElementById('teaser-list');
+  var thanksCount = document.getElementById('thanks-count');
+  var thanksList = document.getElementById('thanks-list');
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -31,23 +33,29 @@
     return '';
   }
 
-  function renderTeaser(data) {
-    var guests = (data && data.guests) || [];
-    var count = (data && typeof data.count === 'number') ? data.count : guests.length;
-    teaserCount.textContent = '🎉 ' + count + (count === 1 ? ' going so far' : ' going so far');
-    teaserList.innerHTML = '';
+  function fillList(countEl, listEl, guests, count) {
+    if (!countEl || !listEl) return;
+    countEl.textContent = '🎉 ' + count + ' going so far';
+    listEl.innerHTML = '';
     if (!guests.length) {
       var li = document.createElement('li');
       li.className = 'teaser-empty';
       li.textContent = 'Be the first to RSVP!';
-      teaserList.appendChild(li);
+      listEl.appendChild(li);
       return;
     }
     guests.forEach(function (g) {
       var li = document.createElement('li');
       li.innerHTML = '<span class="nm">' + esc(g.name) + '</span><span class="arr">' + esc(shortArrival(g.arrival)) + '</span>';
-      teaserList.appendChild(li);
+      listEl.appendChild(li);
     });
+  }
+
+  function renderTeaser(data) {
+    var guests = (data && data.guests) || [];
+    var count = (data && typeof data.count === 'number') ? data.count : guests.length;
+    fillList(teaserCount, teaserList, guests, count);
+    fillList(thanksCount, thanksList, guests, count);
   }
 
   function loadGuests() {
