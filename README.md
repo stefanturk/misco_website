@@ -63,7 +63,3 @@ Resend free tier is ~100/day, plenty for a private party.
 `python3 -m http.server 8000` → http://localhost:8000 — all pages render. The RSVP
 teaser/submit work as soon as `APPS_SCRIPT_URL` is set (the script allows requests
 from any origin, including localhost and GitHub Pages).
-
-> `api/rsvp.js` (+ `vercel.json`, `.env.example`) is an **unused alternative**: an
-> email-via-Resend path kept for later if you ever want RSVPs emailed instead of /
-> in addition to the sheet. The live form uses Apps Script.

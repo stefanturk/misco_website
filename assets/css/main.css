@@ -220,6 +220,23 @@ body::after {
 }
 .hero-meta span { color: var(--accent-3); }
 
+/* countdown to the first night */
+.countdown { display: flex; gap: 1.4rem; justify-content: center; margin-top: 1.8rem; }
+.countdown .cd-unit { display: flex; flex-direction: column; align-items: center; line-height: 1; }
+.countdown .cd-num {
+  font-family: var(--font-display); font-weight: 900;
+  font-size: clamp(1.8rem, 5vw, 2.8rem); color: var(--accent-3);
+  text-shadow: 0 0 18px color-mix(in srgb, var(--accent-3) 55%, transparent);
+}
+.countdown .cd-label {
+  font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.22em;
+  font-size: 0.6rem; color: var(--muted); margin-top: 0.5rem;
+}
+.countdown .cd-go {
+  font-family: var(--font-display); font-weight: 900; font-size: clamp(1.4rem, 4vw, 2rem);
+  color: var(--accent-3); text-shadow: 0 0 18px color-mix(in srgb, var(--accent-3) 55%, transparent);
+}
+
 /* ---------------------------------------------------------------------------
    Buttons
    --------------------------------------------------------------------------- */
@@ -530,9 +547,4 @@ body::after {
   .nav-links a.active { border-bottom-color: var(--line); color: var(--accent-1); }
   .nav-toggle { display: block; }
   .feature-grid { grid-template-columns: 1fr; }
-  .slot { grid-template-columns: 110px 70px 1fr; gap: 0.6rem; }
-}
-@media (max-width: 460px) {
-  .slot { grid-template-columns: 1fr; gap: 0.15rem; padding: 1rem 0; }
-  .slot .where { margin: 0.2rem 0; }
 }
