@@ -76,7 +76,8 @@ var DEFAULT_EMAILS = {
       "Where: Murphys, CA\n" +
       "The bit: Spice World / Double Feature — Friday Dune (1984), Saturday Spice World.\n\n" +
       "See the lineup & schedule: {site}\n\n" +
-      "Reply to this email if anything's off. See you in the foothills."
+      "Need to cancel and get a refund later? No problem — just reach out to Alex and he'll handle it. Text (650) 235-5059.\n\n" +
+      "Please don't reply to this email — it's not monitored. Anything you need, text Alex directly at (650) 235-5059. See you in the foothills."
   },
   gettingClose: {
     label: 'Getting Close',
@@ -91,7 +92,7 @@ var DEFAULT_EMAILS = {
       "{recap}\n" +
       "Haven't squared up? Venmo {venmo} ($50).\n\n" +
       "Check the schedule: {site}schedule.html\n\n" +
-      "Questions? Just reply."
+      "Questions? Don't reply here — text Alex at (650) 235-5059."
   },
   dayOf: {
     label: 'Day Of',
@@ -103,7 +104,7 @@ var DEFAULT_EMAILS = {
       "- You're arriving {arrival} — text when you're close.\n" +
       "- First film starts Friday night. Don't miss it.\n\n" +
       "If you haven't paid: Venmo {venmo} ($50).\n\n" +
-      "Reply or text if you get lost."
+      "Don't reply to this email — text Alex at (650) 235-5059 if you get lost."
   }
 };
 
@@ -193,12 +194,12 @@ function getEmailContent_(key) {
   try {
     var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(EMAILS_SHEET);
     if (sh && sh.getLastRow() > 1) {
-      var vals = sh.getRange(2, 1, sh.getLastRow() - 1, 4).getValues(); // Key,Email,Subject,Body
+      var vals = sh.getRange(2, 1, sh.getLastRow() - 1, 3).getValues(); // Key,Subject,Body
       for (var i = 0; i < vals.length; i++) {
         if (String(vals[i][0]).trim() === key) {
           return {
-            subject: String(vals[i][2] || '').trim() || d.subject,
-            body: String(vals[i][3] || '').trim() || d.body
+            subject: String(vals[i][1] || '').trim() || d.subject,
+            body: String(vals[i][2] || '').trim() || d.body
           };
         }
       }
@@ -314,8 +315,9 @@ function doPost(e) {
       arrival: String(data.arrival || '')
     };
 
+    var stamp = Utilities.formatDate(new Date(), 'America/Los_Angeles', "M/d/yyyy h a 'PT'");
     getSheet_().appendRow([
-      new Date(),
+      stamp,
       guest.name,
       guest.email,
       guest.bunk,
@@ -394,19 +396,18 @@ function ensureEmailsSheet_(reset) {
   if (!sh) { sh = ss.insertSheet(EMAILS_SHEET); reset = true; }
   if (reset) {
     sh.clear();
-    sh.getRange(1, 1, 1, 4).setValues([['Key (do not edit)', 'Email', 'Subject', 'Body']]);
+    sh.getRange(1, 1, 1, 3).setValues([['Key (do not edit)', 'Subject', 'Body']]);
     var rows = EMAIL_ORDER.map(function (k) {
       var d = DEFAULT_EMAILS[k];
-      return [k, d.label, d.subject, d.body];
+      return [k, d.subject, d.body];
     });
-    sh.getRange(2, 1, rows.length, 4).setValues(rows);
+    sh.getRange(2, 1, rows.length, 3).setValues(rows);
     sh.setFrozenRows(1);
-    sh.getRange(1, 1, 1, 4).setFontWeight('bold');
+    sh.getRange(1, 1, 1, 3).setFontWeight('bold');
     sh.setColumnWidth(1, 120);
-    sh.setColumnWidth(2, 110);
-    sh.setColumnWidth(3, 300);
-    sh.setColumnWidth(4, 560);
-    sh.getRange(2, 3, rows.length, 2).setWrap(true).setVerticalAlignment('top');
+    sh.setColumnWidth(2, 300);
+    sh.setColumnWidth(3, 560);
+    sh.getRange(2, 2, rows.length, 2).setWrap(true).setVerticalAlignment('top');
     sh.getRange(rows.length + 3, 1).setValue(
       'Tokens: {firstName} {arrival} {venmo} {site}  ·  body-only: {recap} (their RSVP details)  ·  ' +
       'start a line with "- " for a bullet  ·  blank line = new paragraph. ' +

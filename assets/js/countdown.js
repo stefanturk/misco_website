@@ -1,5 +1,5 @@
 /* Homepage countdown to the first night of Camp Misco.
-   Target: Fri Sept 25, 2026, 00:00 Pacific (-07:00, PDT). Ticks once a minute. */
+   Target: Fri Sept 25, 2026, 00:00 Pacific (-07:00, PDT). Days remaining only. */
 (function () {
   var el = document.getElementById('countdown');
   if (!el) return;
@@ -17,15 +17,10 @@
       el.innerHTML = '<span class="cd-go">It’s go time 🌶️</span>';
       return;
     }
-    var mins = Math.floor(diff / 60000);
-    var days = Math.floor(mins / 1440);
-    var hours = Math.floor((mins % 1440) / 60);
-    var minutes = mins % 60;
-    el.innerHTML = unit(days, days === 1 ? 'day' : 'days') +
-                   unit(hours, hours === 1 ? 'hr' : 'hrs') +
-                   unit(minutes, 'min');
+    var days = Math.ceil(diff / 86400000);
+    el.innerHTML = unit(days, days === 1 ? 'day to go' : 'days to go');
   }
 
   render();
-  setInterval(render, 60000);
+  setInterval(render, 3600000);
 })();
