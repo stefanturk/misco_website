@@ -282,7 +282,30 @@ function onOpen() {
     .addItem('Send "Welcome" to all', 'sendWelcomeAll')
     .addItem('Send "Getting Close" to all', 'sendGettingCloseAll')
     .addItem('Send "Day Of" to all', 'sendDayOfAll')
+    .addSeparator()
+    .addItem('Send test email to me (debug)', 'testEmail')
     .addToUi();
+}
+
+/** Debug: send one email to REPLY_TO and show Resend's raw response. */
+function testEmail() {
+  var ui = SpreadsheetApp.getUi();
+  var key = PropertiesService.getScriptProperties().getProperty('RESEND_API_KEY');
+  if (!key) {
+    ui.alert('No RESEND_API_KEY in Script Properties — add it first.');
+    return;
+  }
+  var resp = UrlFetchApp.fetch('https://api.resend.com/emails', {
+    method: 'post',
+    contentType: 'application/json',
+    headers: { Authorization: 'Bearer ' + key },
+    payload: JSON.stringify({
+      from: FROM, to: [REPLY_TO], reply_to: REPLY_TO,
+      subject: 'Camp Misco test', html: '<p>If you got this, Resend works. 🌶️</p>'
+    }),
+    muteHttpExceptions: true
+  });
+  ui.alert('Resend HTTP ' + resp.getResponseCode(), resp.getContentText(), ui.ButtonSet.OK);
 }
 
 function sendWelcomeAll() { sendBatch_(tplWelcome_, 'Welcome'); }
