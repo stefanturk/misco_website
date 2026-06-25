@@ -453,6 +453,34 @@ body::after {
 }
 .field { margin-bottom: 1.6rem; }
 .field > label { display: block; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.14em; font-size: 0.72rem; color: var(--accent-2); margin-bottom: 0.6rem; }
+.field-hint { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); margin: -0.3rem 0 0.55rem; letter-spacing: 0.02em; }
+
+/* RSVP teaser — who's coming so far */
+.rsvp-teaser {
+  margin-bottom: 1.6rem; border: 1px solid var(--line); border-radius: 6px;
+  padding: 0.9rem 1rem; background: color-mix(in srgb, var(--accent-1) 6%, transparent);
+}
+.teaser-count {
+  font-family: var(--font-display); font-weight: 800; font-size: 1.1rem; color: var(--accent-3);
+  text-shadow: 0 0 16px color-mix(in srgb, var(--accent-3) 45%, transparent); margin-bottom: 0.6rem;
+}
+.teaser-list {
+  list-style: none; max-height: 132px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 0.1rem;
+}
+.teaser-list li {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 0.8rem;
+  padding: 0.28rem 0.1rem; border-bottom: 1px solid var(--line);
+  font-family: var(--font-mono); font-size: 0.82rem; color: var(--text);
+}
+.teaser-list li:last-child { border-bottom: 0; }
+.teaser-list li .arr {
+  flex: 0 0 auto; color: var(--accent-2); font-size: 0.62rem;
+  text-transform: uppercase; letter-spacing: 0.12em;
+}
+.teaser-empty { color: var(--muted); font-family: var(--font-mono); font-size: 0.8rem; }
+.teaser-list::-webkit-scrollbar { width: 6px; }
+.teaser-list::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--accent-1) 40%, transparent); border-radius: 3px; }
 .field input[type=text], .field input[type=password] {
   width: 100%; padding: 0.85rem 1rem; font-family: var(--font-mono); font-size: 0.95rem;
   color: var(--text); background: rgba(0,0,0,0.3);

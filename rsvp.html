@@ -39,8 +39,15 @@
     <form class="form-card hidden" id="rsvp-form">
       <div class="notice cost"><strong>Heads up:</strong> the weekend costs <strong>$50</strong>.</div>
 
+      <!-- Live teaser: who's RSVP'd so far -->
+      <div class="rsvp-teaser">
+        <div class="teaser-count" id="teaser-count">Loading RSVPs…</div>
+        <ul class="teaser-list" id="teaser-list"></ul>
+      </div>
+
       <div class="field">
         <label for="name">Your name</label>
+        <p class="field-hint">Please use your real first and last name that we know you by.</p>
         <input type="text" id="name" name="name" required placeholder="First &amp; last" />
       </div>
 

@@ -1,7 +1,12 @@
-/* RSVP: client-side password gate (light gate — the server re-validates too),
-   then POST the questionnaire to the /api/rsvp serverless function. */
+/* RSVP: client-side password gate, a live "who's coming" teaser, and submit —
+   all talking to the Google Apps Script web app bound to the RSVP sheet.
+   (No backend, no keys in the page.) */
 (function () {
-  // case-insensitive; accept both spellings. Server (api/rsvp.js) checks the same.
+  // ▼▼▼ paste your Apps Script Web app URL (ends in /exec) here ▼▼▼
+  var APPS_SCRIPT_URL = '';
+  // ▲▲▲ until this is set, the teaser shows a placeholder and submit is disabled ▲▲▲
+
+  // case-insensitive; accept both spellings. Apps Script (Code.gs) checks the same.
   var PASSWORDS = ['burgershack', 'bugershack'];
 
   var gate = document.getElementById('gate');
@@ -12,11 +17,57 @@
   var status = document.getElementById('form-status');
   var thanks = document.getElementById('thanks');
   var submitBtn = document.getElementById('submit-btn');
+  var teaserCount = document.getElementById('teaser-count');
+  var teaserList = document.getElementById('teaser-list');
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function shortArrival(a) {
+    a = String(a || '').toLowerCase();
+    if (a.indexOf('friday') !== -1) return 'Fri night';
+    if (a.indexOf('saturday') !== -1) return 'Sat morning';
+    return '';
+  }
+
+  function renderTeaser(data) {
+    var guests = (data && data.guests) || [];
+    var count = (data && typeof data.count === 'number') ? data.count : guests.length;
+    teaserCount.textContent = '🎉 ' + count + (count === 1 ? ' going so far' : ' going so far');
+    teaserList.innerHTML = '';
+    if (!guests.length) {
+      var li = document.createElement('li');
+      li.className = 'teaser-empty';
+      li.textContent = 'Be the first to RSVP!';
+      teaserList.appendChild(li);
+      return;
+    }
+    guests.forEach(function (g) {
+      var li = document.createElement('li');
+      li.innerHTML = '<span class="nm">' + esc(g.name) + '</span><span class="arr">' + esc(shortArrival(g.arrival)) + '</span>';
+      teaserList.appendChild(li);
+    });
+  }
+
+  function loadGuests() {
+    if (!APPS_SCRIPT_URL) {
+      teaserCount.textContent = 'RSVP list appears once setup is finished';
+      teaserList.innerHTML = '';
+      return;
+    }
+    teaserCount.textContent = 'Loading RSVPs…';
+    fetch(APPS_SCRIPT_URL)
+      .then(function (r) { return r.json(); })
+      .then(renderTeaser)
+      .catch(function () { teaserCount.textContent = 'Could not load the RSVP list right now.'; });
+  }
 
   function unlock() {
     if (PASSWORDS.indexOf(pw.value.trim().toLowerCase()) !== -1) {
       gate.classList.add('hidden');
       form.classList.remove('hidden');
+      loadGuests();
     } else {
       gateStatus.textContent = 'Wrong password — try again.';
       pw.value = '';
@@ -29,6 +80,13 @@
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
+
+    if (!APPS_SCRIPT_URL) {
+      status.className = 'form-status error';
+      status.textContent = 'RSVP isn’t live yet — the Google Sheet hookup is still being set up. Check back soon!';
+      return;
+    }
+
     var data = {
       password: pw.value.trim(),
       name: document.getElementById('name').value.trim(),
@@ -41,18 +99,17 @@
     status.textContent = 'Sending…';
     submitBtn.disabled = true;
 
-    fetch('/api/rsvp', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    })
+    // No custom headers -> simple request (text/plain), avoids a CORS preflight Apps Script can't answer.
+    fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) })
+      .then(function (r) { return r.json(); })
       .then(function (res) {
-        if (res.ok) {
+        if (res && res.ok) {
+          loadGuests();
           form.classList.add('hidden');
           thanks.classList.remove('hidden');
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
-          return res.text().then(function (t) { throw new Error(t || ('HTTP ' + res.status)); });
+          throw new Error((res && res.error) || 'unknown error');
         }
       })
       .catch(function (err) {
