@@ -287,7 +287,7 @@ function onOpen() {
     .addToUi();
 }
 
-/** Debug: send one email to REPLY_TO and show Resend's raw response. */
+/** Debug: send one email to an address you type, and show Resend's raw response. */
 function testEmail() {
   var ui = SpreadsheetApp.getUi();
   var key = PropertiesService.getScriptProperties().getProperty('RESEND_API_KEY');
@@ -295,17 +295,22 @@ function testEmail() {
     ui.alert('No RESEND_API_KEY in Script Properties — add it first.');
     return;
   }
+  var ask = ui.prompt('Send a test email',
+    'Type the address to send to (try a non-Gmail/friend address to test real delivery):',
+    ui.ButtonSet.OK_CANCEL);
+  if (ask.getSelectedButton() !== ui.Button.OK) return;
+  var to = String(ask.getResponseText() || '').trim() || REPLY_TO;
   var resp = UrlFetchApp.fetch('https://api.resend.com/emails', {
     method: 'post',
     contentType: 'application/json',
     headers: { Authorization: 'Bearer ' + key },
     payload: JSON.stringify({
-      from: FROM, to: [REPLY_TO], reply_to: REPLY_TO,
+      from: FROM, to: [to], reply_to: REPLY_TO,
       subject: 'Camp Misco test', html: '<p>If you got this, Resend works. 🌶️</p>'
     }),
     muteHttpExceptions: true
   });
-  ui.alert('Resend HTTP ' + resp.getResponseCode(), resp.getContentText(), ui.ButtonSet.OK);
+  ui.alert('Resend HTTP ' + resp.getResponseCode() + ' → ' + to, resp.getContentText(), ui.ButtonSet.OK);
 }
 
 function sendWelcomeAll() { sendBatch_(tplWelcome_, 'Welcome'); }
