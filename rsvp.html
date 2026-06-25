@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RSVP — Camp Misco</title>
+  <link rel="stylesheet" href="assets/css/main.css" />
+</head>
+<body>
+  <canvas id="waves-bg"></canvas>
+
+  <nav class="nav">
+    <a class="nav-brand" href="index.html">CAMP&nbsp;MISCO</a>
+    <button class="nav-toggle" aria-label="Menu">☰</button>
+    <div class="nav-links">
+      <a href="index.html">Welcome</a>
+      <a href="lineup.html">Lineup</a>
+      <a href="schedule.html">Schedule</a>
+      <a href="amenities.html">Amenities</a>
+      <a href="rsvp.html" class="active">RSVP</a>
+    </div>
+  </nav>
+
+  <main class="page rsvp-shell">
+    <p class="section-eyebrow center">Sept 25–27 · Murphys, CA</p>
+    <h1 class="section-title glow center" style="margin-bottom:2rem">RSVP</h1>
+
+    <!-- Password gate -->
+    <div class="gate" id="gate">
+      <div class="field">
+        <label for="pw">Enter the password</label>
+        <input type="password" id="pw" autocomplete="off" placeholder="••••••••" />
+      </div>
+      <button class="btn" id="gate-btn" type="button">Unlock →</button>
+      <p class="form-status error" id="gate-status"></p>
+    </div>
+
+    <!-- Questionnaire (hidden until unlocked) -->
+    <form class="form-card hidden" id="rsvp-form">
+      <div class="notice cost"><strong>Heads up:</strong> the weekend costs <strong>$50</strong>.</div>
+
+      <div class="field">
+        <label for="name">Your name</label>
+        <input type="text" id="name" name="name" required placeholder="First &amp; last" />
+      </div>
+
+      <div class="field">
+        <label>Would you prefer a bunk bed (10 to a room) over camping?</label>
+        <div class="choice">
+          <label><input type="radio" name="bunk" value="Bunk bed" required /><span>Bunk bed</span></label>
+          <label><input type="radio" name="bunk" value="Camping" /><span>Camping</span></label>
+        </div>
+      </div>
+
+      <div class="notice"><strong>Venmo @alex-youngberg</strong> to lock in your spot. Limited availability.</div>
+
+      <div class="field">
+        <label>Are you more likely to arrive Friday night or Saturday morning?</label>
+        <div class="choice">
+          <label><input type="radio" name="arrival" value="Friday night" required /><span>Friday night</span></label>
+          <label><input type="radio" name="arrival" value="Saturday morning" /><span>Saturday morning</span></label>
+        </div>
+      </div>
+
+      <button class="btn" type="submit" id="submit-btn">Send RSVP →</button>
+      <p class="form-status" id="form-status"></p>
+    </form>
+
+    <!-- Thank-you (hidden until submitted) -->
+    <div class="thanks hidden" id="thanks">
+      <h2 class="neon" style="font-size:clamp(2rem,7vw,4rem)">See you there</h2>
+      <p class="lead center">Your RSVP is in. Don’t forget to Venmo <strong>@alex-youngberg</strong> to lock your spot.</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <span>Camp Misco · Murphys, CA</span>
+    <span>Sept 25–27, 2026</span>
+  </footer>
+
+  <script src="assets/js/waves-bg.js"></script>
+  <script src="assets/js/nav.js"></script>
+  <script src="assets/js/rsvp.js"></script>
+</body>
+</html>

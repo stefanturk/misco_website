@@ -1,0 +1,412 @@
+/* ============================================================================
+   CAMP MISCO — design system
+   Neon "Spice World" base that auto-shifts to a Dune desert palette on
+   Friday / .theme-dune content. Plain CSS, easy to iterate.
+   ============================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+
+/* ---------------------------------------------------------------------------
+   Theme tokens
+   --------------------------------------------------------------------------- */
+:root {
+  /* SPICE WORLD (default / Saturday) — neon */
+  --bg:        #120010;
+  --bg-soft:   #1c0420;
+  --text:      #ffffff;
+  --muted:     #d7b8df;
+  --accent-1:  #ff2d95; /* hot pink   */
+  --accent-2:  #00e5ff; /* electric cyan */
+  --accent-3:  #c6ff00; /* lime       */
+  --line:      rgba(255, 45, 149, 0.18);
+  --card:      rgba(255, 255, 255, 0.035);
+
+  /* wave hue stops (HSL hue degrees) — read by waves-bg.js */
+  --wave-hue-a: 320; /* pink */
+  --wave-hue-b: 188; /* cyan */
+  --wave-hue-c: 80;  /* lime */
+  --wave-sat:   95%;
+  --wave-light: 62%;
+
+  --font-display: 'Cinzel', Georgia, serif;
+  --font-mono:    'IBM Plex Mono', ui-monospace, monospace;
+
+  --maxw: 1180px;
+  --nav-h: 64px;
+}
+
+/* DUNE (Friday) — desert. Apply .theme-dune to <body> or any section. */
+.theme-dune {
+  --bg:        #0d0a07;
+  --bg-soft:   #161009;
+  --text:      #f0ead6;
+  --muted:     #c9a86a;
+  --accent-1:  #e8a020; /* amber */
+  --accent-2:  #c2410c; /* rust  */
+  --accent-3:  #e6b35c; /* sand-gold */
+  --line:      rgba(232, 160, 32, 0.18);
+  --card:      rgba(240, 234, 214, 0.04);
+
+  --wave-hue-a: 38;  /* amber */
+  --wave-hue-b: 24;  /* orange */
+  --wave-hue-c: 16;  /* rust  */
+  --wave-sat:   85%;
+  --wave-light: 58%;
+}
+
+/* ---------------------------------------------------------------------------
+   Base
+   --------------------------------------------------------------------------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  animation: page-in 0.4s ease;
+  transition: background 0.5s ease, color 0.5s ease;
+}
+
+@keyframes page-in { from { opacity: 0; } to { opacity: 1; } }
+
+a { color: var(--accent-2); text-decoration: none; transition: color .2s, opacity .2s; }
+a:hover { color: var(--accent-3); }
+
+img { max-width: 100%; display: block; }
+
+h1, h2, h3 { font-family: var(--font-display); font-weight: 800; line-height: 1.02; letter-spacing: 0.02em; }
+
+/* Background layers ---------------------------------------------------------*/
+#waves-bg {
+  position: fixed;
+  top: var(--nav-h); left: 0; right: 0; bottom: 0;
+  width: 100%; height: calc(100% - var(--nav-h));
+  z-index: 1;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+/* film grain (from steezy) */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Everything readable sits above the waves */
+.page { position: relative; z-index: 3; }
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 1.5rem; }
+
+/* ---------------------------------------------------------------------------
+   Nav
+   --------------------------------------------------------------------------- */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 1.5rem;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--line);
+}
+.nav-brand {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.15rem;
+  letter-spacing: 0.18em;
+  color: var(--text);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--accent-1) 70%, transparent);
+}
+.nav-links { display: flex; gap: 1.5rem; align-items: center; }
+.nav-links a {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--muted);
+  padding: 0.35rem 0;
+  border-bottom: 1px solid transparent;
+}
+.nav-links a:hover { color: var(--text); }
+.nav-links a.active { color: var(--accent-1); border-bottom-color: var(--accent-1); }
+.nav-toggle { display: none; background: none; border: 0; color: var(--text); cursor: pointer; font-size: 1.4rem; }
+
+/* ---------------------------------------------------------------------------
+   Hero / neon wordmark
+   --------------------------------------------------------------------------- */
+.hero {
+  position: relative;
+  min-height: 92vh;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  text-align: center;
+  padding: calc(var(--nav-h) + 2rem) 1.5rem 4rem;
+}
+.hero-photo {
+  position: absolute; inset: 0; z-index: -1;
+  background-size: cover; background-position: center;
+  filter: brightness(0.32) saturate(1.1);
+}
+.hero-photo::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--bg) 40%, transparent) 0%, transparent 30%, color-mix(in srgb, var(--bg) 92%, transparent) 100%);
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.42em;
+  font-size: 0.74rem;
+  color: var(--accent-2);
+  margin-bottom: 1.4rem;
+}
+
+/* glowing neon-sign wordmark */
+.neon {
+  font-family: var(--font-display);
+  font-weight: 900;
+  line-height: 0.92;
+  letter-spacing: 0.04em;
+  color: #fff;
+  text-shadow:
+    0 0 6px  #fff,
+    0 0 16px var(--accent-1),
+    0 0 34px var(--accent-1),
+    0 0 60px var(--accent-1),
+    0 0 90px color-mix(in srgb, var(--accent-2) 80%, transparent);
+  animation: neon-flicker 6s infinite;
+}
+.neon .small { display: block; font-size: 0.32em; letter-spacing: 0.34em; color: var(--accent-2);
+  text-shadow: 0 0 6px var(--accent-2), 0 0 20px var(--accent-2); margin-bottom: 0.2em; }
+.hero .neon { font-size: clamp(3.4rem, 13vw, 9.5rem); }
+
+@keyframes neon-flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+  20%, 24%, 55% { opacity: 0.72; }
+}
+
+.hero-meta {
+  margin-top: 1.6rem;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  font-size: clamp(0.78rem, 2vw, 1rem);
+  color: var(--text);
+}
+.hero-meta span { color: var(--accent-3); }
+
+/* ---------------------------------------------------------------------------
+   Buttons
+   --------------------------------------------------------------------------- */
+.btn {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  font-family: var(--font-mono);
+  text-transform: uppercase; letter-spacing: 0.2em;
+  font-size: 0.8rem; font-weight: 500;
+  padding: 0.95rem 2.1rem;
+  border: 1px solid var(--accent-1);
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent-1) 12%, transparent);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: transform .15s ease, background .2s ease, box-shadow .2s ease;
+}
+.btn:hover {
+  transform: translateY(-2px);
+  background: color-mix(in srgb, var(--accent-1) 26%, transparent);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--accent-1) 55%, transparent);
+  color: #fff;
+}
+.btn-ghost { border-color: var(--accent-2); background: color-mix(in srgb, var(--accent-2) 10%, transparent); }
+.btn-ghost:hover { box-shadow: 0 0 24px color-mix(in srgb, var(--accent-2) 55%, transparent); }
+.btn-row { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-top: 2.2rem; }
+
+/* ---------------------------------------------------------------------------
+   Sections + headings
+   --------------------------------------------------------------------------- */
+.section { padding: 5rem 0; position: relative; }
+.section-eyebrow {
+  font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.34em;
+  font-size: 0.72rem; color: var(--accent-2); margin-bottom: 0.8rem;
+}
+.section-title { font-size: clamp(2rem, 5vw, 3.6rem); margin-bottom: 0.6rem; }
+.section-title.glow { text-shadow: 0 0 24px color-mix(in srgb, var(--accent-1) 45%, transparent); }
+.lead { color: var(--muted); max-width: 60ch; font-size: 1.02rem; }
+.center { text-align: center; margin-left: auto; margin-right: auto; }
+
+/* ---------------------------------------------------------------------------
+   Double-feature cards (home)
+   --------------------------------------------------------------------------- */
+.feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; margin-top: 2.4rem; }
+.feature {
+  position: relative; overflow: hidden;
+  border: 1px solid var(--line); border-radius: 4px;
+  padding: 2.4rem 2rem; min-height: 260px;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  background: var(--card);
+  transition: transform .2s ease, box-shadow .25s ease;
+}
+.feature:hover { transform: translateY(-4px); box-shadow: 0 14px 40px rgba(0,0,0,0.45); }
+.feature .tag { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.28em; font-size: 0.7rem; color: var(--accent-2); }
+.feature .film { font-size: clamp(1.8rem, 4vw, 3rem); margin: 0.4rem 0 0.3rem; }
+.feature .film-sub { color: var(--muted); font-size: 0.86rem; letter-spacing: 0.1em; }
+
+/* ---------------------------------------------------------------------------
+   Lineup (festival poster)
+   --------------------------------------------------------------------------- */
+.poster { text-align: center; padding: 3rem 0 5rem; }
+.poster-names { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 0.2em 0.6em; }
+.poster-names a {
+  font-family: var(--font-display); font-weight: 800; color: var(--text);
+  line-height: 1.05; letter-spacing: 0.01em; transition: color .2s, text-shadow .2s;
+}
+.poster-names a:nth-child(3n+1) { color: var(--text); }
+.poster-names a:hover { color: var(--accent-1); text-shadow: 0 0 26px color-mix(in srgb, var(--accent-1) 60%, transparent); }
+/* size variation for poster feel */
+.s-xl { font-size: clamp(2.4rem, 8vw, 6rem); }
+.s-lg { font-size: clamp(1.8rem, 6vw, 4.4rem); }
+.s-md { font-size: clamp(1.4rem, 4.5vw, 3.2rem); }
+.poster-dot { color: var(--accent-3); font-family: var(--font-display); }
+.poster-note {
+  margin-top: 3rem; font-family: var(--font-mono); text-transform: uppercase;
+  letter-spacing: 0.3em; font-size: 0.72rem; color: var(--muted);
+}
+
+/* ---------------------------------------------------------------------------
+   Schedule
+   --------------------------------------------------------------------------- */
+.sched-block {
+  border: 1px solid var(--line); border-radius: 6px;
+  background: var(--card);
+  padding: 2rem 1.8rem; margin-bottom: 1.8rem;
+  transition: background .5s ease;
+}
+.sched-block h2 { font-size: clamp(1.6rem, 4vw, 2.6rem); margin-bottom: 0.3rem; }
+.sched-block .day-sub { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.26em; font-size: 0.7rem; color: var(--accent-2); margin-bottom: 1.4rem; }
+.slot {
+  display: grid; grid-template-columns: 150px 84px 1fr; gap: 1rem; align-items: baseline;
+  padding: 0.7rem 0; border-top: 1px solid var(--line);
+}
+.slot:first-of-type { border-top: 0; }
+.slot .time { font-family: var(--font-mono); font-size: 0.82rem; color: var(--accent-3); letter-spacing: 0.06em; }
+.slot .where {
+  font-family: var(--font-mono); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.18em;
+  justify-self: start; padding: 0.18em 0.6em; border-radius: 2px; border: 1px solid var(--line);
+}
+.slot .where.inside  { color: var(--accent-2); border-color: color-mix(in srgb, var(--accent-2) 40%, transparent); }
+.slot .where.outside { color: var(--accent-1); border-color: color-mix(in srgb, var(--accent-1) 40%, transparent); }
+.slot .act { font-size: 1rem; }
+.slot .act.headliner { font-family: var(--font-display); font-weight: 700; font-size: 1.2rem; }
+
+/* ---------------------------------------------------------------------------
+   Amenities
+   --------------------------------------------------------------------------- */
+.amenity-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.3rem; margin-top: 2.4rem; }
+.amenity-card {
+  border: 1px solid var(--line); border-radius: 6px; overflow: hidden;
+  background: var(--card); transition: transform .2s, box-shadow .25s;
+}
+.amenity-card:hover { transform: translateY(-4px); box-shadow: 0 14px 36px rgba(0,0,0,0.45); }
+.amenity-photo {
+  height: 170px; background-size: cover; background-position: center;
+  filter: brightness(0.78) saturate(1.05);
+  display: flex; align-items: flex-end;
+}
+.amenity-photo.placeholder {
+  background: repeating-linear-gradient(45deg, var(--bg-soft), var(--bg-soft) 12px, color-mix(in srgb, var(--accent-1) 8%, var(--bg-soft)) 12px, color-mix(in srgb, var(--accent-1) 8%, var(--bg-soft)) 24px);
+  align-items: center; justify-content: center;
+}
+.amenity-photo.placeholder span {
+  font-family: var(--font-mono); font-size: 0.64rem; text-transform: uppercase;
+  letter-spacing: 0.22em; color: var(--muted);
+}
+.amenity-body { padding: 1.1rem 1.2rem 1.4rem; }
+.amenity-body h3 { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; }
+.amenity-body p { color: var(--muted); font-size: 0.85rem; margin-top: 0.3rem; }
+
+/* ---------------------------------------------------------------------------
+   RSVP
+   --------------------------------------------------------------------------- */
+.rsvp-shell { max-width: 620px; margin: 0 auto; padding: calc(var(--nav-h) + 3rem) 1.5rem 5rem; }
+.gate, .form-card {
+  border: 1px solid var(--line); border-radius: 8px; background: var(--card);
+  padding: 2.4rem 2rem; backdrop-filter: blur(6px);
+}
+.field { margin-bottom: 1.6rem; }
+.field > label { display: block; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.14em; font-size: 0.72rem; color: var(--accent-2); margin-bottom: 0.6rem; }
+.field input[type=text], .field input[type=password] {
+  width: 100%; padding: 0.85rem 1rem; font-family: var(--font-mono); font-size: 0.95rem;
+  color: var(--text); background: rgba(0,0,0,0.3);
+  border: 1px solid var(--line); border-radius: 3px; outline: none; transition: border-color .2s, box-shadow .2s;
+}
+.field input:focus { border-color: var(--accent-1); box-shadow: 0 0 16px color-mix(in srgb, var(--accent-1) 35%, transparent); }
+.choice { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+.choice label {
+  flex: 1 1 160px; cursor: pointer; padding: 0.85rem 1rem; border: 1px solid var(--line);
+  border-radius: 3px; font-family: var(--font-mono); font-size: 0.84rem; text-align: center;
+  transition: border-color .2s, background .2s, color .2s;
+}
+.choice input { position: absolute; opacity: 0; }
+.choice input:checked + span { color: #fff; }
+.choice label:has(input:checked) { border-color: var(--accent-1); background: color-mix(in srgb, var(--accent-1) 20%, transparent); box-shadow: 0 0 18px color-mix(in srgb, var(--accent-1) 35%, transparent); }
+.notice {
+  border-left: 3px solid var(--accent-3); padding: 0.9rem 1.1rem; margin-bottom: 1.6rem;
+  background: color-mix(in srgb, var(--accent-3) 8%, transparent); border-radius: 0 4px 4px 0;
+  font-size: 0.9rem; color: var(--text);
+}
+.notice strong { color: var(--accent-3); }
+.notice.cost strong { font-size: 1.05rem; }
+.form-status { margin-top: 1.2rem; font-family: var(--font-mono); font-size: 0.85rem; min-height: 1.2em; }
+.form-status.error { color: var(--accent-1); }
+.form-status.ok { color: var(--accent-3); }
+.thanks { text-align: center; padding: 2rem 0; }
+.thanks h2 { font-size: clamp(1.8rem, 5vw, 3rem); margin-bottom: 0.8rem; }
+.hidden { display: none !important; }
+
+/* ---------------------------------------------------------------------------
+   Footer
+   --------------------------------------------------------------------------- */
+.site-footer {
+  position: relative; z-index: 3;
+  border-top: 1px solid var(--line); margin-top: 3rem;
+  padding: 2rem 1.5rem;
+  display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+  font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase;
+  letter-spacing: 0.2em; color: var(--muted);
+}
+
+/* ---------------------------------------------------------------------------
+   Responsive
+   --------------------------------------------------------------------------- */
+@media (max-width: 760px) {
+  .nav-links {
+    position: fixed; top: var(--nav-h); right: 0; left: 0;
+    flex-direction: column; gap: 0; align-items: stretch;
+    background: color-mix(in srgb, var(--bg) 96%, transparent);
+    border-bottom: 1px solid var(--line);
+    max-height: 0; overflow: hidden; transition: max-height .3s ease;
+  }
+  .nav-links.open { max-height: 340px; }
+  .nav-links a { padding: 1rem 1.5rem; border-bottom: 1px solid var(--line); }
+  .nav-links a.active { border-bottom-color: var(--line); color: var(--accent-1); }
+  .nav-toggle { display: block; }
+  .feature-grid { grid-template-columns: 1fr; }
+  .slot { grid-template-columns: 110px 70px 1fr; gap: 0.6rem; }
+}
+@media (max-width: 460px) {
+  .slot { grid-template-columns: 1fr; gap: 0.15rem; padding: 1rem 0; }
+  .slot .where { margin: 0.2rem 0; }
+}

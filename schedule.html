@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Schedule — Camp Misco</title>
+  <link rel="stylesheet" href="assets/css/main.css" />
+</head>
+<body>
+  <canvas id="waves-bg"></canvas>
+
+  <nav class="nav">
+    <a class="nav-brand" href="index.html">CAMP&nbsp;MISCO</a>
+    <button class="nav-toggle" aria-label="Menu">☰</button>
+    <div class="nav-links">
+      <a href="index.html">Welcome</a>
+      <a href="lineup.html">Lineup</a>
+      <a href="schedule.html" class="active">Schedule</a>
+      <a href="amenities.html">Amenities</a>
+      <a href="rsvp.html">RSVP</a>
+    </div>
+  </nav>
+
+  <main class="page">
+    <section class="section" style="padding-top:calc(var(--nav-h) + 3rem)">
+      <div class="wrap">
+        <p class="section-eyebrow center">Daily Lineup</p>
+        <h1 class="section-title glow center" style="margin-bottom:2.6rem">Schedule</h1>
+
+        <!-- FRIDAY NIGHT — Dune desert theme -->
+        <div class="sched-block theme-dune">
+          <h2>Friday Night</h2>
+          <p class="day-sub">Dune (1984) · the spice must flow</p>
+
+          <div class="slot"><span class="time">7:00 – 8:00</span><span class="where outside">Outside</span><span class="act">Jam</span></div>
+          <div class="slot"><span class="time">8:00 – 9:00</span><span class="where outside">Outside</span><span class="act">The Real Experience</span></div>
+          <div class="slot"><span class="time">9:00 – 10:00</span><span class="where inside">Inside</span><span class="act">2K House Band</span></div>
+          <div class="slot"><span class="time">10:00 – 11:30</span><span class="where outside">Outside</span><span class="act headliner">Pabsy <small style="font-weight:400;font-family:var(--font-mono);font-size:0.7rem;color:var(--muted)">1.5 hr</small></span></div>
+          <div class="slot"><span class="time">11:30 – 12:30</span><span class="where inside">Inside</span><span class="act">DJ</span></div>
+          <div class="slot"><span class="time">12:30 – 1:30</span><span class="where inside">Inside</span><span class="act">Wabsy <small style="font-weight:400;font-family:var(--font-mono);font-size:0.7rem;color:var(--muted)">1 hr</small></span></div>
+          <div class="slot"><span class="time">1:30 – 3:00 am</span><span class="where inside">Inside</span><span class="act">Jam</span></div>
+        </div>
+
+        <!-- SATURDAY DAY — Spice World theme -->
+        <div class="sched-block">
+          <h2>Saturday Day</h2>
+          <p class="day-sub">Brunch, talent show &amp; flunkyball</p>
+
+          <div class="slot"><span class="time">Noon – 1:00</span><span class="where outside">Outside</span><span class="act">Jam</span></div>
+          <div class="slot"><span class="time">1:00 – 2:00</span><span class="where outside">Outside</span><span class="act">Noah Stid Hawaiian Band</span></div>
+          <div class="slot"><span class="time">2:00 – 2:30</span><span class="where outside">Outside</span><span class="act">Brunch</span></div>
+          <div class="slot"><span class="time">2:30 – 3:30</span><span class="where outside">Outside</span><span class="act">2K House Band</span></div>
+          <div class="slot"><span class="time">3:30 – 4:20</span><span class="where outside">Outside</span><span class="act">Talent Show</span></div>
+          <div class="slot"><span class="time">4:20 – 5:00</span><span class="where outside">Outside</span><span class="act">Flunkyball Finals</span></div>
+          <div class="slot"><span class="time">5:30 – 7:00</span><span class="where outside">Outside</span><span class="act headliner">Pabsy <small style="font-weight:400;font-family:var(--font-mono);font-size:0.7rem;color:var(--muted)">1.5 hr</small></span></div>
+        </div>
+
+        <!-- SATURDAY NIGHT — Spice World theme -->
+        <div class="sched-block">
+          <h2>Saturday Night</h2>
+          <p class="day-sub">Spice World · drag show &amp; headliners</p>
+
+          <div class="slot"><span class="time">7:00 – 7:30</span><span class="where inside">Inside</span><span class="act">Rourke</span></div>
+          <div class="slot"><span class="time">7:30 – 9:00</span><span class="where outside">Outside</span><span class="act headliner">Litty D <small style="font-weight:400;font-family:var(--font-mono);font-size:0.7rem;color:var(--muted)">1.5 hr</small></span></div>
+          <div class="slot"><span class="time">9:00 – 9:30</span><span class="where inside">Inside</span><span class="act">Rourke</span></div>
+          <div class="slot"><span class="time">9:30 – 11:00</span><span class="where outside">Outside</span><span class="act headliner">Trianna <small style="font-weight:400;font-family:var(--font-mono);font-size:0.7rem;color:var(--muted)">1.5 hr</small></span></div>
+          <div class="slot"><span class="time">11:00 – 11:30</span><span class="where inside">Inside</span><span class="act">Drag Show</span></div>
+          <div class="slot"><span class="time">11:30 – 12:30</span><span class="where inside">Inside</span><span class="act">DJ</span></div>
+          <div class="slot"><span class="time">12:30 – 1:30</span><span class="where inside">Inside</span><span class="act">Space Goat</span></div>
+          <div class="slot"><span class="time">1:30 – 3:00</span><span class="where inside">Inside</span><span class="act">Jam</span></div>
+        </div>
+
+        <div class="btn-row">
+          <a class="btn" href="rsvp.html">RSVP →</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>Camp Misco · Murphys, CA</span>
+    <span>Sept 25–27, 2026</span>
+  </footer>
+
+  <script src="assets/js/waves-bg.js"></script>
+  <script src="assets/js/nav.js"></script>
+</body>
+</html>
