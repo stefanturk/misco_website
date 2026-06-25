@@ -27,29 +27,87 @@
  * ── EMAIL ────────────────────────────────────────────────────────────────────
  *  Emails send from misco@littyd.com via Resend (littyd.com must stay verified in
  *  Resend). The key lives in Script Properties (step 4) — never in the public site.
- *  • On RSVP: guest gets tplWelcome_, organizers get a notify (toggles below).
- *  • Batch: reload the sheet → "Camp Misco" menu → Send Welcome / Getting Close / Day Of.
- *  • Edit the email copy in the TEMPLATES block below, then redeploy a new version.
+ *  • The copy for the 3 emails lives in an "Emails" TAB in this spreadsheet, so anyone
+ *    can edit Subject/Body without touching code. Run  Camp Misco ▸ Set up / reset
+ *    "Emails" tab  once to create it (seeds the defaults below).
+ *  • In Subject/Body you can use tokens: {firstName} {arrival} {venmo} {site} and, in
+ *    the Body only, {recap} (the guest's own RSVP details). Start a line with "- " for
+ *    a bullet; a blank line starts a new paragraph. Branding (header/footer) is added
+ *    automatically. If the tab is missing/blank, the built-in defaults are used.
+ *  • On RSVP: guest gets the "welcome" email, organizers get a notify (toggles below).
+ *  • Camp Misco menu ▸ Test to founders ▸ (Welcome / Getting Close / Day Of) sends a
+ *    preview to the founders so you can check the format before the real blast.
+ *  • Camp Misco menu ▸ Send to EVERYONE ▸ (…) does the real de-duplicated batch send.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
 // ── Config ───────────────────────────────────────────────────────────────────
 var SHEET_NAME = 'RSVPs';
+var EMAILS_SHEET = 'Emails';
 var HEADERS = ['Timestamp', 'Name', 'Email', 'Bunk or Camping', 'Venmo Handle', 'Arrival', 'Notes'];
 var PASSWORDS = ['burgershack', 'bugershack']; // accepted on submit; matches the website gate
 
 var FROM = 'Camp Misco <misco@littyd.com>';            // must be a Resend-verified domain
 var REPLY_TO = 'stefanturkowski@gmail.com';            // guest replies land here
-var ADMIN_TO = ['oodsigma28@gmail.com', 'stefanturkowski@gmail.com']; // notify on each RSVP
-var SITE_URL = 'https://stefanturk.github.io/misco_website/';
+var FOUNDERS = ['oodsigma28@gmail.com', 'stefanturkowski@gmail.com']; // test previews + RSVP notices
+var ADMIN_TO = FOUNDERS;                               // notify on each RSVP
+var SITE_URL = 'https://campmisco.com/';
 var VENMO = '@alex-youngberg';
 
 var SEND_WELCOME_ON_RSVP = true; // email the guest a "ticket" the moment they RSVP
 var SEND_ADMIN_NOTIFY = true;    // email the organizers on each RSVP
 
-// ── EMAIL TEMPLATES (edit the copy here) ──────────────────────────────────────
-// Each tpl*_ takes a guest {name, email, bunk, venmo, arrival} and returns {subject, html}.
+// ── DEFAULT EMAIL COPY ─────────────────────────────────────────────────────────
+// Seeds the "Emails" tab and is the fallback if that tab is missing/blank. Edit the
+// LIVE copy in the spreadsheet's "Emails" tab — no need to touch this.
+// Tokens: {firstName} {arrival} {venmo} {site}; body-only block token: {recap}.
+// Line starting with "- " => bullet. Blank line => new paragraph.
+var EMAIL_ORDER = ['welcome', 'gettingClose', 'dayOf'];
+var DEFAULT_EMAILS = {
+  welcome: {
+    label: 'Welcome',
+    subject: "🌶️ You're in — Camp Misco (Sept 25–27)",
+    body:
+      "You're on the list, {firstName}! 🌶️\n\n" +
+      "Consider this your ticket. Here's the plan we've got down for you:\n\n" +
+      "{recap}\n" +
+      "Lock your spot: the weekend is $50 — Venmo {venmo} if you haven't already.\n\n" +
+      "When: Friday Sept 25 – Sunday Sept 27, 2026\n" +
+      "Where: Murphys, CA\n" +
+      "The bit: Spice World / Double Feature — Friday Dune (1984), Saturday Spice World.\n\n" +
+      "See the lineup & schedule: {site}\n\n" +
+      "Reply to this email if anything's off. See you in the foothills."
+  },
+  gettingClose: {
+    label: 'Getting Close',
+    subject: '🌶️ Camp Misco is almost here',
+    body:
+      "Almost showtime, {firstName}!\n\n" +
+      "Camp Misco is just around the corner. A few things to get you ready:\n" +
+      "- Pack layers — foothill nights get cold.\n" +
+      "- Bring a swimsuit (Pool Stage), a flashlight, and a refillable bottle.\n" +
+      "- Costumes encouraged for the double feature: Dune (Fri) & Spice World (Sat).\n\n" +
+      "Your plan with us:\n\n" +
+      "{recap}\n" +
+      "Haven't squared up? Venmo {venmo} ($50).\n\n" +
+      "Check the schedule: {site}schedule.html\n\n" +
+      "Questions? Just reply."
+  },
+  dayOf: {
+    label: 'Day Of',
+    subject: '🌶️ Camp Misco — today!',
+    body:
+      "It's today, {firstName}! 🌶️\n\n" +
+      "Travel safe — here's what you need:\n" +
+      "- Address & directions: (ADD THE VENUE ADDRESS HERE)\n" +
+      "- You're arriving {arrival} — text when you're close.\n" +
+      "- First film starts Friday night. Don't miss it.\n\n" +
+      "If you haven't paid: Venmo {venmo} ($50).\n\n" +
+      "Reply or text if you get lost."
+  }
+};
 
+// ── Rendering: editable text -> branded HTML ──────────────────────────────────
 function firstName_(name) {
   var n = String(name || '').trim().split(/\s+/)[0];
   return n || 'there';
@@ -84,58 +142,75 @@ function recapHtml_(g) {
     '</table>';
 }
 
-function tplWelcome_(g) {
-  var subject = "🌶️ You're in — Camp Misco (Sept 25–27)";
-  var html = wrapEmail_(
-    '<h1 style="font-size:22px;margin:0 0 12px;color:#fff;">You\'re on the list, ' + esc_(firstName_(g.name)) + '!</h1>' +
-    '<p style="margin:0 0 12px;">Consider this your ticket. Here\'s what we\'ve got down for you:</p>' +
-    recapHtml_(g) +
-    '<div style="background:#241236;border:1px solid #4a2a6e;border-radius:10px;padding:16px;margin:18px 0;">' +
-      '<strong style="color:#ffd0ec;">Lock your spot:</strong> the weekend is <strong>$50</strong> — ' +
-      'Venmo <strong>' + esc_(VENMO) + '</strong> if you haven\'t already.' +
-    '</div>' +
-    '<p style="margin:0 0 6px;"><strong>When:</strong> Friday Sept 25 – Sunday Sept 27, 2026</p>' +
-    '<p style="margin:0 0 6px;"><strong>Where:</strong> Murphys, CA</p>' +
-    '<p style="margin:0 0 18px;"><strong>The bit:</strong> Spice World / Double Feature — Friday <em>Dune</em> (1984), Saturday <em>Spice World</em>.</p>' +
-    '<p style="margin:0 0 18px;"><a href="' + SITE_URL + '" style="display:inline-block;background:#ff3da6;color:#fff;text-decoration:none;font-weight:700;padding:12px 22px;border-radius:999px;">See the lineup &amp; schedule →</a></p>' +
-    '<p style="margin:0;color:#9b86bf;font-size:13px;">Reply to this email if anything\'s off. See you in the foothills.</p>'
-  );
-  return { subject: subject, html: html };
+/** Replace inline tokens inside one escaped line, then auto-link bare URLs. */
+function inlineTokens_(s, g) {
+  var out = esc_(s)
+    .replace(/\{firstName\}/g, esc_(firstName_(g.name)))
+    .replace(/\{arrival\}/g, esc_(g.arrival || 'whenever you can'))
+    .replace(/\{venmo\}/g, esc_(VENMO))
+    .replace(/\{site\}/g, esc_(SITE_URL));
+  out = out.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" style="color:#ff84c4;">$1</a>');
+  return out;
 }
 
-function tplGettingClose_(g) {
-  var subject = '🌶️ Camp Misco is almost here';
-  var html = wrapEmail_(
-    '<h1 style="font-size:22px;margin:0 0 12px;color:#fff;">Almost showtime, ' + esc_(firstName_(g.name)) + '</h1>' +
-    '<p style="margin:0 0 12px;">Camp Misco is just around the corner. A few things to get you ready:</p>' +
-    '<ul style="margin:0 0 16px;padding-left:20px;">' +
-      '<li style="margin:6px 0;">Pack layers — foothill nights get cold.</li>' +
-      '<li style="margin:6px 0;">Bring a swimsuit (Pool Stage), a flashlight, and a refillable bottle.</li>' +
-      '<li style="margin:6px 0;">Double feature: <em>Dune</em> (Fri) &amp; <em>Spice World</em> (Sat) — costumes encouraged.</li>' +
-    '</ul>' +
-    '<p style="margin:0 0 6px;">Your plan with us:</p>' +
-    recapHtml_(g) +
-    '<p style="margin:0 0 18px;">Haven\'t squared up? Venmo <strong>' + esc_(VENMO) + '</strong> ($50).</p>' +
-    '<p style="margin:0 0 18px;"><a href="' + SITE_URL + 'schedule.html" style="display:inline-block;background:#9b5cff;color:#fff;text-decoration:none;font-weight:700;padding:12px 22px;border-radius:999px;">Check the schedule →</a></p>' +
-    '<p style="margin:0;color:#9b86bf;font-size:13px;">Questions? Just reply.</p>'
-  );
-  return { subject: subject, html: html };
+function subjectTokens_(s, g) {
+  return String(s || '')
+    .replace(/\{firstName\}/g, firstName_(g.name))
+    .replace(/\{arrival\}/g, g.arrival || '')
+    .replace(/\{venmo\}/g, VENMO)
+    .replace(/\{site\}/g, SITE_URL);
 }
 
-function tplDayOf_(g) {
-  var subject = '🌶️ Camp Misco — today!';
-  var html = wrapEmail_(
-    '<h1 style="font-size:22px;margin:0 0 12px;color:#fff;">It\'s today, ' + esc_(firstName_(g.name)) + '!</h1>' +
-    '<p style="margin:0 0 12px;">Travel safe and we\'ll see you soon. Day-of notes:</p>' +
-    '<ul style="margin:0 0 16px;padding-left:20px;">' +
-      '<li style="margin:6px 0;">Address &amp; directions: <em>(add here)</em></li>' +
-      '<li style="margin:6px 0;">Arriving ' + esc_(g.arrival || 'whenever you can') + ' — text when you\'re close.</li>' +
-      '<li style="margin:6px 0;">First film starts Friday night. Don\'t miss it.</li>' +
-    '</ul>' +
-    '<p style="margin:0 0 18px;">If you haven\'t paid: Venmo <strong>' + esc_(VENMO) + '</strong> ($50).</p>' +
-    '<p style="margin:0;color:#9b86bf;font-size:13px;">Reply or text if you get lost.</p>'
-  );
-  return { subject: subject, html: html };
+/** Turn plain editable text (with tokens, "- " bullets, blank-line paragraphs) into HTML. */
+function bodyToHtml_(text, g) {
+  var lines = String(text || '').replace(/\r\n/g, '\n').split('\n');
+  var html = '';
+  var bullets = [];
+  function flush() {
+    if (bullets.length) {
+      html += '<ul style="margin:0 0 16px;padding-left:20px;">' + bullets.join('') + '</ul>';
+      bullets = [];
+    }
+  }
+  for (var i = 0; i < lines.length; i++) {
+    var trimmed = lines[i].trim();
+    if (trimmed === '{recap}') { flush(); html += recapHtml_(g); continue; }
+    if (trimmed === '') { flush(); continue; }
+    if (/^[-•]\s+/.test(trimmed)) {
+      bullets.push('<li style="margin:6px 0;">' + inlineTokens_(trimmed.replace(/^[-•]\s+/, ''), g) + '</li>');
+      continue;
+    }
+    flush();
+    html += '<p style="margin:0 0 14px;">' + inlineTokens_(trimmed, g) + '</p>';
+  }
+  flush();
+  return html;
+}
+
+/** Read the live copy for a template from the "Emails" tab, falling back to defaults. */
+function getEmailContent_(key) {
+  var d = DEFAULT_EMAILS[key] || { subject: '', body: '' };
+  try {
+    var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(EMAILS_SHEET);
+    if (sh && sh.getLastRow() > 1) {
+      var vals = sh.getRange(2, 1, sh.getLastRow() - 1, 4).getValues(); // Key,Email,Subject,Body
+      for (var i = 0; i < vals.length; i++) {
+        if (String(vals[i][0]).trim() === key) {
+          return {
+            subject: String(vals[i][2] || '').trim() || d.subject,
+            body: String(vals[i][3] || '').trim() || d.body
+          };
+        }
+      }
+    }
+  } catch (e) { Logger.log('getEmailContent_ ' + e); }
+  return { subject: d.subject, body: d.body };
+}
+
+/** {subject, html} for a template + guest, using the live (or default) copy. */
+function renderEmail_(key, g) {
+  var c = getEmailContent_(key);
+  return { subject: subjectTokens_(c.subject, g), html: wrapEmail_(bodyToHtml_(c.body, g)) };
 }
 
 function adminNotifyHtml_(g) {
@@ -252,7 +327,7 @@ function doPost(e) {
     // Emails are best-effort — a send failure must NOT fail the RSVP.
     try {
       if (SEND_WELCOME_ON_RSVP && guest.email && guest.email.indexOf('@') !== -1) {
-        var w = tplWelcome_(guest);
+        var w = renderEmail_('welcome', guest);
         sendEmail_(guest.email, w.subject, w.html);
       }
       if (SEND_ADMIN_NOTIFY) {
@@ -276,20 +351,99 @@ function doGet() {
   return json_({ count: guests.length, guests: guests });
 }
 
-// ── Batch sends (custom spreadsheet menu — no code/terminal needed) ────────────
+// ── Spreadsheet menu (no code/terminal needed) ─────────────────────────────────
 function onOpen() {
-  SpreadsheetApp.getUi().createMenu('Camp Misco')
-    .addItem('Send "Welcome" to all', 'sendWelcomeAll')
-    .addItem('Send "Getting Close" to all', 'sendGettingCloseAll')
-    .addItem('Send "Day Of" to all', 'sendDayOfAll')
+  var ui = SpreadsheetApp.getUi();
+  ui.createMenu('Camp Misco')
+    .addItem('Set up / reset "Emails" tab', 'setupEmailsSheet')
+    .addSeparator()
+    .addSubMenu(ui.createMenu('Test to founders (preview)')
+      .addItem('Welcome', 'sendWelcomeTest')
+      .addItem('Getting Close', 'sendGettingCloseTest')
+      .addItem('Day Of', 'sendDayOfTest'))
+    .addSubMenu(ui.createMenu('Send to EVERYONE')
+      .addItem('Welcome', 'sendWelcomeAll')
+      .addItem('Getting Close', 'sendGettingCloseAll')
+      .addItem('Day Of', 'sendDayOfAll'))
     .addToUi();
 }
 
-function sendWelcomeAll() { sendBatch_(tplWelcome_, 'Welcome'); }
-function sendGettingCloseAll() { sendBatch_(tplGettingClose_, 'Getting Close'); }
-function sendDayOfAll() { sendBatch_(tplDayOf_, 'Day Of'); }
+// ── "Emails" tab: editable copy ────────────────────────────────────────────────
+/** Create (or reset to defaults) the editable Emails tab. */
+function setupEmailsSheet() {
+  var ui = SpreadsheetApp.getUi();
+  var existing = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(EMAILS_SHEET);
+  if (existing) {
+    var go = ui.alert('Reset the "Emails" tab?',
+      'This overwrites the Subject/Body cells with the built-in defaults. Continue?',
+      ui.ButtonSet.YES_NO);
+    if (go !== ui.Button.YES) return;
+  }
+  var sh = ensureEmailsSheet_(true);
+  sh.activate();
+  ui.alert('Ready',
+    'The "Emails" tab is set up. Edit any Subject/Body cell to change what goes out — ' +
+    'no code needed. Tokens: {firstName} {arrival} {venmo} {site} {recap}. ' +
+    'Start a line with "- " for a bullet.',
+    ui.ButtonSet.OK);
+}
 
-function sendBatch_(templateFn, label) {
+function ensureEmailsSheet_(reset) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sh = ss.getSheetByName(EMAILS_SHEET);
+  if (!sh) { sh = ss.insertSheet(EMAILS_SHEET); reset = true; }
+  if (reset) {
+    sh.clear();
+    sh.getRange(1, 1, 1, 4).setValues([['Key (do not edit)', 'Email', 'Subject', 'Body']]);
+    var rows = EMAIL_ORDER.map(function (k) {
+      var d = DEFAULT_EMAILS[k];
+      return [k, d.label, d.subject, d.body];
+    });
+    sh.getRange(2, 1, rows.length, 4).setValues(rows);
+    sh.setFrozenRows(1);
+    sh.getRange(1, 1, 1, 4).setFontWeight('bold');
+    sh.setColumnWidth(1, 120);
+    sh.setColumnWidth(2, 110);
+    sh.setColumnWidth(3, 300);
+    sh.setColumnWidth(4, 560);
+    sh.getRange(2, 3, rows.length, 2).setWrap(true).setVerticalAlignment('top');
+    sh.getRange(rows.length + 3, 1).setValue(
+      'Tokens: {firstName} {arrival} {venmo} {site}  ·  body-only: {recap} (their RSVP details)  ·  ' +
+      'start a line with "- " for a bullet  ·  blank line = new paragraph. ' +
+      'The header/footer branding is added automatically.');
+  }
+  return sh;
+}
+
+// ── Test previews (to founders) ────────────────────────────────────────────────
+function sendWelcomeTest() { sendTest_('welcome', 'Welcome'); }
+function sendGettingCloseTest() { sendTest_('gettingClose', 'Getting Close'); }
+function sendDayOfTest() { sendTest_('dayOf', 'Day Of'); }
+
+function sendTest_(key, label) {
+  var ui = SpreadsheetApp.getUi();
+  if (!PropertiesService.getScriptProperties().getProperty('RESEND_API_KEY')) {
+    ui.alert('No RESEND_API_KEY set',
+      'Add it first: Project Settings ▸ Script Properties ▸ RESEND_API_KEY = your Resend key.',
+      ui.ButtonSet.OK);
+    return;
+  }
+  // A sample guest so {recap}/{firstName}/{arrival} render like a real send.
+  var sample = { name: 'Stefan', email: '', bunk: 'Bunk bed', venmo: '@your-venmo', arrival: 'Friday night' };
+  var t = renderEmail_(key, sample);
+  var ok = sendEmail_(FOUNDERS, '[TEST] ' + t.subject, t.html);
+  ui.alert(ok ? 'Test sent' : 'Test failed',
+    ok ? 'Sent the "' + label + '" preview to the founders:\n' + FOUNDERS.join(', ')
+       : 'Resend rejected it — check Extensions ▸ Apps Script ▸ Executions for the error.',
+    ui.ButtonSet.OK);
+}
+
+// ── Real batch sends (to all guests) ───────────────────────────────────────────
+function sendWelcomeAll() { sendBatch_('welcome', 'Welcome'); }
+function sendGettingCloseAll() { sendBatch_('gettingClose', 'Getting Close'); }
+function sendDayOfAll() { sendBatch_('dayOf', 'Day Of'); }
+
+function sendBatch_(key, label) {
   var ui = SpreadsheetApp.getUi();
 
   if (!PropertiesService.getScriptProperties().getProperty('RESEND_API_KEY')) {
@@ -316,14 +470,14 @@ function sendBatch_(templateFn, label) {
     return;
   }
 
-  var go = ui.alert('Send "' + label + '" email',
-    'Send to ' + recipients.length + ' guest(s)?',
+  var go = ui.alert('Send "' + label + '" to EVERYONE',
+    'This emails all ' + recipients.length + ' guest(s) for real. Sent the preview to the founders first? Continue?',
     ui.ButtonSet.YES_NO);
   if (go !== ui.Button.YES) return;
 
   var sent = 0, failed = 0;
   for (var j = 0; j < recipients.length; j++) {
-    var t = templateFn(recipients[j]);
+    var t = renderEmail_(key, recipients[j]);
     if (sendEmail_(recipients[j].email, t.subject, t.html)) sent++;
     else failed++;
     Utilities.sleep(200); // be gentle on the API

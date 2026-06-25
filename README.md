@@ -39,22 +39,30 @@ the Heads-up notice, and appends each submission as a row. Password to view the 
 ## Emails (Apps Script + Resend)
 The same `apps-script/Code.gs` sends branded email from **`misco@littyd.com`** via Resend
 (`littyd.com` must stay verified in Resend). The key lives in **Script Properties** — never
-in the public site. Editable copy lives in the `tpl*_` functions (the `EMAIL TEMPLATES` block).
+in the public site.
 
-- **On RSVP:** the guest gets a "ticket" welcome email and the organizers
+**The copy for the 3 emails lives in an editable "Emails" tab** in the spreadsheet — anyone
+can change Subject/Body with no code. Run **Camp Misco ▸ Set up / reset "Emails" tab** once
+to create it (seeds defaults). In Subject/Body you can use tokens `{firstName}` `{arrival}`
+`{venmo}` `{site}` and, in the Body only, `{recap}` (the guest's own RSVP details). Start a
+line with `- ` for a bullet; a blank line starts a new paragraph. Branding (header/footer) is
+added automatically. If the tab is missing/blank, the built-in `DEFAULT_EMAILS` copy is used.
+
+- **On RSVP:** the guest gets the "welcome" email and the founders
   (`oodsigma28@gmail.com`, `stefanturkowski@gmail.com`) get a notify. Toggle with
   `SEND_WELCOME_ON_RSVP` / `SEND_ADMIN_NOTIFY`. Email failures never block the RSVP.
-- **Batch sends (admin, no terminal):** reload the sheet → **Camp Misco** menu →
-  *Send "Welcome" / "Getting Close" / "Day Of" to all*. Each shows a count + confirm,
-  de-dupes by email, and reports sent/failed. Edit the three later emails in `tplGettingClose_`
-  / `tplDayOf_` before sending.
+- **Test to founders (preview):** **Camp Misco** menu → *Test to founders ▸ Welcome /
+  Getting Close / Day Of* renders the live copy for a sample guest and emails it (subject
+  prefixed `[TEST]`) to the founders only — check the format before the real blast.
+- **Send to EVERYONE (real):** **Camp Misco** menu → *Send to EVERYONE ▸ …*. Shows a count +
+  confirm, de-dupes by email, and reports sent/failed.
 
 One-time setup:
 1. Apps Script ▸ **Project Settings ▸ Script Properties** ▸ add `RESEND_API_KEY` = the Resend key.
 2. Re-paste the updated `Code.gs`, **Save**.
 3. **Deploy ▸ Manage deployments ▸ ✏️ ▸ Version: New version ▸ Deploy** (web-app URL stays the same).
-4. Reload the sheet → the **Camp Misco** menu appears. First batch run prompts authorization
-   for external requests (UrlFetchApp) — approve it.
+4. Reload the sheet → the **Camp Misco** menu appears, then run **Set up / reset "Emails" tab**.
+   The first send prompts authorization for external requests (UrlFetchApp) — approve it.
 
 Without the key, RSVPs still save to the sheet — they just don't email (safe no-op).
 Resend free tier is ~100/day, plenty for a private party.
