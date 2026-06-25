@@ -73,7 +73,10 @@ function doGet() {
     var rows = sh.getRange(2, 1, last - 1, 6).getValues();
     for (var i = 0; i < rows.length; i++) {
       var nm = String(rows[i][1] || '').trim();
-      if (nm) guests.push({ name: nm, arrival: String(rows[i][5] || '') });
+      if (!nm) continue;
+      // skip a stray header row if it ever lands in the data range
+      if (nm === 'Name' && String(rows[i][5] || '') === 'Arrival') continue;
+      guests.push({ name: nm, arrival: String(rows[i][5] || '') });
     }
   }
   return json_({ count: guests.length, guests: guests });
