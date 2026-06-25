@@ -33,6 +33,7 @@
       password: pw.value.trim(),
       name: document.getElementById('name').value.trim(),
       bunk: (form.elements.bunk.value || ''),
+      venmoed: (form.elements.venmoed.checked ? 'Yes' : 'No'),
       arrival: (form.elements.arrival.value || '')
     };
 

@@ -189,8 +189,10 @@ body::after {
     0 0 34px var(--accent-1),
     0 0 60px var(--accent-1),
     0 0 90px color-mix(in srgb, var(--accent-2) 80%, transparent);
-  animation: neon-flicker 3.4s infinite;
+  animation: neon-flicker 6.8s infinite;
 }
+/* steady (no flash) when hovering the sign */
+.neon:hover { animation: none; opacity: 1; }
 .neon .small { display: block; font-size: 0.32em; letter-spacing: 0.34em; color: var(--accent-2);
   text-shadow: 0 0 6px var(--accent-2), 0 0 20px var(--accent-2); margin-bottom: 0.2em; }
 .hero .neon { font-size: clamp(3.4rem, 13vw, 9.5rem); }
@@ -272,21 +274,18 @@ body::after {
    --------------------------------------------------------------------------- */
 .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2.6rem; }
 
-/* Retro 50s movie-poster cards */
+/* Retro 50s movie-poster cards (clickable -> trailer) */
 .feature {
   position: relative; overflow: hidden;
-  min-height: 440px;
   display: flex; flex-direction: column; align-items: center; text-align: center;
-  padding: 1.1rem;
+  padding: 1rem;
+  color: var(--text); text-decoration: none;
   background:
-    radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--accent-1) 30%, transparent) 0%, transparent 55%),
-    radial-gradient(120% 90% at 50% 100%, color-mix(in srgb, var(--accent-2) 26%, transparent) 0%, transparent 55%),
+    radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--accent-1) 24%, transparent) 0%, transparent 55%),
     var(--bg-soft);
   border: 3px solid var(--accent-3);
-  outline: 1px solid color-mix(in srgb, var(--accent-1) 60%, transparent);
-  outline-offset: -10px;
   border-radius: 2px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.5), inset 0 0 60px rgba(0,0,0,0.35);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
   transform: rotate(-1.2deg);
   transition: transform .25s ease, box-shadow .25s ease;
 }
@@ -295,52 +294,55 @@ body::after {
 
 /* banner ribbon at top */
 .feature .tag {
-  align-self: stretch; margin: 0.4rem 0 1.2rem;
+  align-self: stretch; margin-bottom: 0.9rem;
   font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.3em;
-  font-size: 0.66rem; font-weight: 600; color: #120010;
+  font-size: 0.64rem; font-weight: 600; color: #120010;
   background: var(--accent-3); padding: 0.5rem; border-radius: 1px;
 }
-.feature .billing {
-  font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.34em;
-  font-size: 0.6rem; color: var(--accent-2); margin-bottom: 0.6rem;
+/* DVD cover image — swap background-image when real art exists; remove .placeholder */
+.feature-cover {
+  width: 100%; aspect-ratio: 2 / 3;
+  background-size: cover; background-position: center;
+  border: 1px solid color-mix(in srgb, var(--accent-1) 50%, transparent);
+}
+.feature-cover.placeholder {
+  background: repeating-linear-gradient(45deg, var(--bg-soft), var(--bg-soft) 14px, color-mix(in srgb, var(--accent-1) 10%, var(--bg-soft)) 14px, color-mix(in srgb, var(--accent-1) 10%, var(--bg-soft)) 28px);
+  display: grid; place-items: center;
+}
+.feature-cover.placeholder span {
+  font-family: var(--font-mono); font-size: 0.62rem; text-transform: uppercase;
+  letter-spacing: 0.22em; color: var(--muted);
 }
 .feature .film {
   font-family: var(--font-display); font-weight: 900;
-  font-size: clamp(2.6rem, 6vw, 4.6rem); line-height: 0.92; margin: auto 0;
+  font-size: clamp(1.8rem, 4vw, 3rem); line-height: 0.96; margin: 0.9rem 0 0.2rem;
   color: #fff;
-  text-shadow: 0 0 8px var(--accent-1), 0 0 26px var(--accent-1), 3px 3px 0 var(--accent-2);
+  text-shadow: 0 0 8px var(--accent-1), 0 0 22px var(--accent-1);
 }
-.feature .starburst {
-  margin-top: auto;
-  font-family: var(--font-display); font-weight: 800; font-size: 0.9rem;
-  text-transform: uppercase; letter-spacing: 0.1em; color: #120010;
-  background: var(--accent-1);
-  padding: 0.7rem 1rem; border-radius: 50%;
-  width: 92px; height: 92px; display: grid; place-items: center;
-  transform: rotate(-8deg);
-  box-shadow: 0 0 24px color-mix(in srgb, var(--accent-1) 70%, transparent);
+.feature .watch {
+  font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.22em;
+  font-size: 0.6rem; color: var(--accent-2);
 }
 
 /* ---------------------------------------------------------------------------
    Lineup (festival poster)
    --------------------------------------------------------------------------- */
 .poster { text-align: center; padding: 3rem 0 5rem; }
-/* 2 bands per row, all the same size */
+/* poster lineup: names flow together, 2-3 per line, all about the same size */
 .poster-names {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 1.6rem 1.2rem;
-  margin-top: 1rem; align-items: center;
+  display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline;
+  gap: 0.35em 0.6em; max-width: 46rem; margin: 1rem auto 0; line-height: 1.15;
 }
 .poster-names a {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  display: inline-flex; align-items: baseline; gap: 0.3em;
   font-family: var(--font-display); font-weight: 800; color: var(--text);
-  font-size: clamp(1.5rem, 3.4vw, 2.6rem);
-  line-height: 1.04; letter-spacing: 0.01em; min-height: 2.4em;
+  font-size: clamp(1.5rem, 3.4vw, 2.6rem); letter-spacing: 0.01em;
   transition: color .2s, text-shadow .2s, transform .2s;
 }
 .poster-names a:hover { color: var(--accent-1); transform: scale(1.04);
   text-shadow: 0 0 26px color-mix(in srgb, var(--accent-1) 60%, transparent); }
-.poster-names a .sub { font-size: 0.46em; font-weight: 600; color: var(--accent-3); letter-spacing: 0.04em; }
-@media (max-width: 560px) { .poster-names { grid-template-columns: 1fr; } }
+.poster-names a .sub { font-size: 0.5em; font-weight: 600; color: var(--accent-3); letter-spacing: 0.03em; }
+.poster-dot { font-family: var(--font-display); color: var(--accent-3); font-size: clamp(1.2rem, 2.6vw, 2rem); opacity: 0.7; }
 
 /* ---------------------------------------------------------------------------
    Schedule
@@ -385,13 +387,15 @@ body::after {
   border: 1px solid var(--line); border-radius: 6px; overflow: hidden;
   background: var(--card); transition: transform .28s ease, box-shadow .28s ease;
 }
-/* 2x popout on hover so the photo is easy to see */
+/* 2x popout on hover — lifts up toward center, solid background so it's easy to see */
 .amenity-card:hover {
-  transform: scale(2); z-index: 50;
-  box-shadow: 0 24px 70px rgba(0,0,0,0.7), 0 0 50px color-mix(in srgb, var(--accent-1) 30%, transparent);
+  transform: scale(2) translateY(-12%); z-index: 50;
+  background: var(--bg);
+  box-shadow: 0 24px 70px rgba(0,0,0,0.8), 0 0 50px color-mix(in srgb, var(--accent-1) 30%, transparent);
 }
-@media (max-width: 760px) { .amenity-grid { grid-template-columns: 1fr 1fr; } .amenity-card:hover { transform: scale(1.5); } }
-@media (max-width: 460px) { .amenity-grid { grid-template-columns: 1fr; } .amenity-card:hover { transform: scale(1.15); } }
+.amenity-card:hover .amenity-photo { filter: brightness(0.95) saturate(1.05); }
+@media (max-width: 760px) { .amenity-grid { grid-template-columns: 1fr 1fr; } .amenity-card:hover { transform: scale(1.5) translateY(-8%); } }
+@media (max-width: 460px) { .amenity-grid { grid-template-columns: 1fr; } .amenity-card:hover { transform: scale(1.12); } }
 .amenity-photo {
   height: 170px; background-size: cover; background-position: center;
   filter: brightness(0.78) saturate(1.05);

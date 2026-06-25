@@ -42,6 +42,7 @@ export default async function handler(req, res) {
 
   const name = (body.name || '').toString().trim() || 'Someone';
   const bunk = body.bunk || '—';
+  const venmoed = body.venmoed || '—';
   const arrival = body.arrival || '—';
 
   const html = `
@@ -50,6 +51,7 @@ export default async function handler(req, res) {
       <table style="border-collapse:collapse">
         <tr><td style="padding:4px 16px 4px 0;color:#666">Name</td><td><strong>${esc(name)}</strong></td></tr>
         <tr><td style="padding:4px 16px 4px 0;color:#666">Bunk vs camping</td><td>${esc(bunk)}</td></tr>
+        <tr><td style="padding:4px 16px 4px 0;color:#666">Venmoed Alex</td><td>${esc(venmoed)}</td></tr>
         <tr><td style="padding:4px 16px 4px 0;color:#666">Arrival</td><td>${esc(arrival)}</td></tr>
       </table>
       <p style="color:#888;font-size:12px;margin-top:16px">Reminder: $50 · Venmo @alex-youngberg to lock in the spot.</p>
