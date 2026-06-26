@@ -332,6 +332,10 @@ body::after {
   color: #fff;
   text-shadow: 0 0 8px var(--accent-1), 0 0 22px var(--accent-1);
 }
+.feature .feature-caption {
+  margin: 0 0 0.6rem; color: var(--muted); font-style: italic;
+  font-size: 0.9rem; line-height: 1.35;
+}
 .feature .watch {
   font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.22em;
   font-size: 0.6rem; color: var(--accent-2);
