@@ -193,7 +193,7 @@ body::after {
 }
 /* steady (no flash) when hovering the sign */
 .neon:hover { animation: none; opacity: 1; }
-.neon .small { display: block; font-size: 0.32em; letter-spacing: 0.34em; color: var(--accent-2);
+.neon .small { display: block; font-size: 0.78em; letter-spacing: 0.16em; color: var(--accent-2);
   text-shadow: 0 0 6px var(--accent-2), 0 0 20px var(--accent-2); margin-bottom: 0.2em; }
 .hero .neon { font-size: clamp(3.4rem, 13vw, 9.5rem); }
 
