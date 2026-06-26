@@ -22,22 +22,22 @@
  *
  *  After ANY edit to this script you must Deploy ▸ Manage deployments ▸ edit ▸
  *  Version: New version ▸ Deploy (or the /exec URL keeps serving the old code).
- *  Reload the sheet to pick up changes to the "Camp Misco" menu.
+ *  Reload the sheet to pick up changes to the "Misco Emails" menu.
  *
  * ── EMAIL ────────────────────────────────────────────────────────────────────
  *  Emails send from misco@littyd.com via Resend (littyd.com must stay verified in
  *  Resend). The key lives in Script Properties (step 4) — never in the public site.
  *  • The copy for the 3 emails lives in an "Emails" TAB in this spreadsheet, so anyone
- *    can edit Subject/Body without touching code. Run  Camp Misco ▸ Set up / reset
+ *    can edit Subject/Body without touching code. Run  Misco Emails ▸ Set up / reset
  *    "Emails" tab  once to create it (seeds the defaults below).
  *  • In Subject/Body you can use tokens: {firstName} {arrival} {venmo} {site} and, in
  *    the Body only, {recap} (the guest's own RSVP details). Start a line with "- " for
  *    a bullet; a blank line starts a new paragraph. Branding (header/footer) is added
  *    automatically. If the tab is missing/blank, the built-in defaults are used.
  *  • On RSVP: guest gets the "welcome" email, organizers get a notify (toggles below).
- *  • Camp Misco menu ▸ Test to founders ▸ (Welcome / Getting Close / Day Of) sends a
+ *  • Misco Emails menu ▸ Test to founders ▸ (Welcome / Getting Close / Day Of) sends a
  *    preview to the founders so you can check the format before the real blast.
- *  • Camp Misco menu ▸ Send to EVERYONE ▸ (…) does the real de-duplicated batch send.
+ *  • Misco Emails menu ▸ Send to EVERYONE ▸ (…) does the real de-duplicated batch send.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
@@ -356,7 +356,7 @@ function doGet() {
 // ── Spreadsheet menu (no code/terminal needed) ─────────────────────────────────
 function onOpen() {
   var ui = SpreadsheetApp.getUi();
-  ui.createMenu('Camp Misco')
+  ui.createMenu('Misco Emails')
     .addItem('Set up / reset "Emails" tab', 'setupEmailsSheet')
     .addSeparator()
     .addSubMenu(ui.createMenu('Test to founders (preview)')
