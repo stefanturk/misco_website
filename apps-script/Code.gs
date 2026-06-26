@@ -66,7 +66,7 @@ var EMAIL_ORDER = ['welcome', 'gettingClose', 'dayOf'];
 var DEFAULT_EMAILS = {
   welcome: {
     label: 'Welcome',
-    subject: "🪩 You're in — Camp Misco (Sept 25–27)",
+    subject: "🪩 You're in — Camp Misco 4 (Sept 25–27)",
     body:
       "You're on the list, {firstName}! 🪩\n\n" +
       "Consider this your ticket. Here's the plan we've got down for you:\n\n" +
@@ -81,13 +81,13 @@ var DEFAULT_EMAILS = {
   },
   gettingClose: {
     label: 'Getting Close',
-    subject: '🪩 Camp Misco is almost here',
+    subject: '🪩 Camp Misco 4 is almost here',
     body:
       "Almost showtime, {firstName}!\n\n" +
       "Camp Misco is just around the corner. A few things to get you ready:\n" +
       "- Pack layers — foothill nights get cold.\n" +
       "- Bring a swimsuit (Pool Stage), a flashlight, and a refillable bottle.\n" +
-      "- Costumes encouraged for the double feature: Dune (Fri) & Spice World (Sat).\n\n" +
+      "- Costumes encouraged for the double feature: Dune (1984) (Fri) & Spice World (Sat).\n\n" +
       "Your plan with us:\n\n" +
       "{recap}\n" +
       "Haven't squared up? Venmo {venmo} ($50).\n\n" +
@@ -96,7 +96,7 @@ var DEFAULT_EMAILS = {
   },
   dayOf: {
     label: 'Day Of',
-    subject: '🪩 Camp Misco — today!',
+    subject: '🪩 Camp Misco 4 — today!',
     body:
       "It's today, {firstName}! 🪩\n\n" +
       "Travel safe — here's what you need:\n" +

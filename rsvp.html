@@ -34,7 +34,7 @@
   </nav>
 
   <main class="page rsvp-shell">
-    <p class="section-eyebrow center">Sept 25–27 · Murphys, CA</p>
+    <p class="section-eyebrow center">Camp Misco 4 · Sept 25–27 · Murphys, CA</p>
     <h1 class="section-title glow center" style="margin-bottom:2rem">RSVP</h1>
 
     <!-- Password gate -->
@@ -49,11 +49,7 @@
 
     <!-- Questionnaire (hidden until unlocked) -->
     <form class="form-card hidden" id="rsvp-form">
-      <!-- Live teaser: who's RSVP'd so far -->
-      <div class="rsvp-teaser">
-        <div class="teaser-count" id="teaser-count">Loading RSVPs…</div>
-        <ul class="teaser-list" id="teaser-list"></ul>
-      </div>
+      <div class="notice">This is a small festival, so please don’t invite people or share the password. Want to bring someone? Ask <strong>Alex</strong> if there’s room first — text <strong>(650) 235-5059</strong>.</div>
 
       <div class="field">
         <label for="name">Your name</label>
@@ -67,20 +63,20 @@
         <input type="email" id="email" name="email" required placeholder="you@example.com" />
       </div>
 
-      <div class="field">
-        <label>Would you prefer a bunk bed (10 to a room) over camping?</label>
-        <div class="choice">
-          <label><input type="radio" name="bunk" value="Bunk bed" required /><span>Bunk bed</span></label>
-          <label><input type="radio" name="bunk" value="Camping" /><span>Camping</span></label>
-        </div>
-      </div>
-
       <div class="notice cost">Attendance is <strong>$50</strong> to help pay for the venue and the bands.</div>
 
       <div class="field">
         <label for="venmo">Need to venmo @alex-youngberg to lock in your spot. What venmo did you send it from?</label>
         <p class="field-hint">Starts with @ — e.g. @alex-youngberg. (Limited availability.)</p>
         <input type="text" id="venmo" name="venmo" required pattern="@.+" title="Your Venmo username, starting with @" placeholder="@your-venmo" />
+      </div>
+
+      <div class="field">
+        <label>Would you prefer a bunk bed (10 to a room) over camping?</label>
+        <div class="choice">
+          <label><input type="radio" name="bunk" value="Bunk bed" required /><span>Bunk bed</span></label>
+          <label><input type="radio" name="bunk" value="Camping" /><span>Camping</span></label>
+        </div>
       </div>
 
       <div class="field">
@@ -107,11 +103,6 @@
       </div>
     </div>
   </main>
-
-  <section class="page-quote">
-    <blockquote>“And that day dawned when Arrakis lay at the hub of the universe with the wheel poised to spin.”</blockquote>
-    <cite>— From ‘Arrakis Awakening’ by Princess Irulan</cite>
-  </section>
 
   <footer class="site-footer">
     <span>Camp Misco · Murphys, CA</span>

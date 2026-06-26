@@ -195,6 +195,8 @@ body::after {
 .neon:hover { animation: none; opacity: 1; }
 .neon .small { display: block; font-size: 0.78em; letter-spacing: 0.16em; color: var(--accent-2);
   text-shadow: 0 0 6px var(--accent-2), 0 0 20px var(--accent-2); margin-bottom: 0.2em; }
+.neon .edition { font-size: 0.6em; color: var(--accent-3); margin-left: 0.12em; vertical-align: 0.18em;
+  text-shadow: 0 0 6px var(--accent-3), 0 0 22px var(--accent-3); }
 .hero .neon { font-size: clamp(3.4rem, 13vw, 9.5rem); }
 
 @keyframes neon-flicker {
@@ -346,10 +348,14 @@ body::after {
    --------------------------------------------------------------------------- */
 .poster { text-align: center; padding: calc(var(--nav-h) + 3rem) 0 2.5rem; }
 .poster .section-title { font-size: clamp(3rem, 7.5vw, 5.4rem); }
-/* poster lineup: names flow together, 2-3 per line, all about the same size */
+/* poster lineup: balanced rows, all names about the same size */
 .poster-names {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 0.35em; max-width: 56rem; margin: 1rem auto 0; line-height: 1.15;
+}
+.poster-line {
   display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline;
-  gap: 0.35em 0.6em; max-width: 56rem; margin: 1rem auto 0; line-height: 1.15;
+  gap: 0.3em 0.6em;
 }
 .poster-names a {
   display: inline-flex; align-items: baseline; gap: 0.3em;
@@ -367,7 +373,6 @@ body::after {
   font-size: 0.5em; font-weight: 600; color: var(--text); letter-spacing: 0.03em;
   transition: color .2s, text-shadow .2s; }
 .poster-names a:hover .sub { color: var(--accent-1); }
-.poster-dot { font-family: var(--font-display); color: var(--accent-3); font-size: clamp(1.8rem, 3.9vw, 3rem); opacity: 0.7; }
 
 /* ---------------------------------------------------------------------------
    Schedule

@@ -6,7 +6,7 @@ window.MISCO_BANDS = {
   'Pabsy': '#',
   'Wabsy': '#',
   'Dogwater': '#',
-  'Noah’s Hawaiian String Band': '#',
+  'Hot Hawaiian String Band': '#',
   '2K House Band': '#',
   'The Real Experience': '#',
   'Mezcal Lynn': '#',

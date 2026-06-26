@@ -59,23 +59,17 @@
   }
 
   function loadGuests() {
-    if (!APPS_SCRIPT_URL) {
-      teaserCount.textContent = 'RSVP list appears once setup is finished';
-      teaserList.innerHTML = '';
-      return;
-    }
-    teaserCount.textContent = 'Loading RSVPs…';
+    if (!APPS_SCRIPT_URL) return;
     fetch(APPS_SCRIPT_URL)
       .then(function (r) { return r.json(); })
       .then(renderTeaser)
-      .catch(function () { teaserCount.textContent = 'Could not load the RSVP list right now.'; });
+      .catch(function () {});
   }
 
   function unlock() {
     if (PASSWORDS.indexOf(pw.value.trim().toLowerCase()) !== -1) {
       gate.classList.add('hidden');
       form.classList.remove('hidden');
-      loadGuests();
     } else {
       gateStatus.textContent = 'Wrong password — try again.';
       pw.value = '';
