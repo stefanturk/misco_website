@@ -349,8 +349,12 @@ body::after {
 .poster-names a:hover { color: var(--accent-1); transform: scale(1.04);
   text-shadow: 0 0 26px color-mix(in srgb, var(--accent-1) 60%, transparent); }
 .poster-names a:has(.sub) { flex-wrap: wrap; justify-content: center; }
+/* headliner act drops onto its own full-width second line */
+.poster-names a.poster-headliner { flex-basis: 100%; margin-top: 0.2em; }
 .poster-names a .sub { flex-basis: 100%; text-align: center;
-  font-size: 0.5em; font-weight: 600; color: var(--text); letter-spacing: 0.03em; }
+  font-size: 0.5em; font-weight: 600; color: var(--text); letter-spacing: 0.03em;
+  transition: color .2s, text-shadow .2s; }
+.poster-names a:hover .sub { color: var(--accent-1); }
 .poster-dot { font-family: var(--font-display); color: var(--accent-3); font-size: clamp(1.2rem, 2.6vw, 2rem); opacity: 0.7; }
 
 /* ---------------------------------------------------------------------------
