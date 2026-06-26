@@ -527,6 +527,22 @@ body::after {
 /* ---------------------------------------------------------------------------
    Footer
    --------------------------------------------------------------------------- */
+/* closing quote above the footer */
+.page-quote {
+  position: relative; z-index: 3;
+  max-width: 46rem; margin: 0 auto; padding: 3rem 1.5rem 0; text-align: center;
+}
+.page-quote blockquote {
+  margin: 0; font-family: var(--font-display); font-weight: 600; font-style: italic;
+  font-size: clamp(1.05rem, 2.4vw, 1.5rem); line-height: 1.4; color: var(--text);
+  text-shadow: 0 0 18px color-mix(in srgb, var(--accent-1) 35%, transparent);
+}
+.page-quote cite {
+  display: block; margin-top: 1rem; font-style: normal;
+  font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase;
+  letter-spacing: 0.2em; color: var(--accent-3);
+}
+
 .site-footer {
   position: relative; z-index: 3;
   border-top: 1px solid var(--line); margin-top: 1.5rem;
