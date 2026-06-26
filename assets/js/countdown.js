@@ -14,7 +14,7 @@
   function render() {
     var diff = TARGET - Date.now();
     if (diff <= 0) {
-      el.innerHTML = '<span class="cd-go">It’s go time 🌶️</span>';
+      el.innerHTML = '<span class="cd-go">It’s go time 🪩</span>';
       return;
     }
     var days = Math.ceil(diff / 86400000);
