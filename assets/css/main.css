@@ -422,6 +422,7 @@ body::after {
   text-shadow: 0 0 14px var(--accent-1); }
 .ticket .act.headliner::before { content: "\2605 "; color: var(--accent-3); }
 .ticket .act.headliner::after  { content: " \2605"; color: var(--accent-3); }
+.ticket .act .sub { font-size: 0.6em; font-weight: 700; margin-left: 0.35em; }
 .ticket .where {
   align-self: flex-start;
   font-family: var(--font-mono); font-size: 0.56rem; text-transform: uppercase; letter-spacing: 0.16em;
