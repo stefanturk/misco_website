@@ -29,9 +29,12 @@ window.MISCO_BANDS = {
     var name = el.getAttribute('data-band');
     el.style.setProperty('--band-color', 'hsl(' + hueFor(name) + ' 85% 62%)');
 
+    // Only make it a real link if we have an actual URL. '#' placeholders and
+    // unlisted acts stay non-clickable (an <a> without href isn't a link).
     var url = window.MISCO_BANDS[name];
-    if (!url) return;
+    if (!url || url === '#') return;
     el.setAttribute('href', url);
-    if (url !== '#') { el.setAttribute('target', '_blank'); el.setAttribute('rel', 'noopener'); }
+    el.setAttribute('target', '_blank');
+    el.setAttribute('rel', 'noopener');
   });
 })();

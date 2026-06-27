@@ -438,7 +438,7 @@ body::after {
   font-size: clamp(1.1rem, 1.7vw, 1.6rem); color: var(--text);
   transition: color .2s, text-shadow .2s;
 }
-.ticket a.act:hover { color: var(--band-color, var(--accent-1)); text-shadow: 0 0 16px color-mix(in srgb, var(--band-color, var(--accent-1)) 55%, transparent); }
+.ticket:hover .act { color: var(--band-color, var(--accent-1)); text-shadow: 0 0 16px color-mix(in srgb, var(--band-color, var(--accent-1)) 55%, transparent); }
 .ticket .act.headliner { font-size: clamp(1.4rem, 2.3vw, 2.1rem); color: #fff;
   text-shadow: 0 0 14px var(--accent-1); }
 .ticket .act .sub { font-size: 0.6em; font-weight: 700; margin-left: 0.35em; }
