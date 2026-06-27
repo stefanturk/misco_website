@@ -88,6 +88,21 @@ img { max-width: 100%; display: block; }
 h1, h2, h3 { font-family: var(--font-display); font-weight: 800; line-height: 1.02; letter-spacing: 0.02em; }
 
 /* Background layers ---------------------------------------------------------*/
+/* full-page festival photo behind every page; parallax driven by parallax.js */
+.site-bg {
+  position: fixed; left: 0; right: 0; top: 0;
+  height: 120vh;            /* 20vh of headroom for the parallax pan */
+  z-index: -1; pointer-events: none;
+  background-image: url('../../photos/header.jpeg');
+  background-size: cover; background-position: center top;
+  filter: brightness(0.45) saturate(1.1);
+  will-change: transform;
+}
+.site-bg::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg) 22%, transparent), color-mix(in srgb, var(--bg) 45%, transparent));
+}
+
 #waves-bg {
   position: fixed;
   top: var(--nav-h); left: 0; right: 0; bottom: 0;
@@ -156,15 +171,6 @@ body::after {
   display: flex; flex-direction: column; justify-content: center; align-items: center;
   text-align: center;
   padding: calc(var(--nav-h) + 2rem) 1.5rem 4rem;
-}
-.hero-photo {
-  position: absolute; inset: 0; z-index: -1;
-  background-size: cover; background-position: center;
-  filter: brightness(0.32) saturate(1.1);
-}
-.hero-photo::after {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(to bottom, color-mix(in srgb, var(--bg) 40%, transparent) 0%, transparent 30%, color-mix(in srgb, var(--bg) 92%, transparent) 100%);
 }
 
 .eyebrow {
@@ -351,11 +357,11 @@ body::after {
 /* poster lineup: balanced rows, all names about the same size */
 .poster-names {
   display: flex; flex-direction: column; align-items: center;
-  gap: 0.35em; max-width: 56rem; margin: 1rem auto 0; line-height: 1.15;
+  gap: 0.6em; max-width: 56rem; margin: 1rem auto 0; line-height: 1.15;
 }
 .poster-line {
   display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline;
-  gap: 0.3em 0.6em;
+  gap: 0.4em 1.6em;
 }
 .poster-names a {
   display: inline-flex; align-items: baseline; gap: 0.3em;
@@ -363,8 +369,8 @@ body::after {
   font-size: clamp(2.25rem, 5.1vw, 3.9rem); letter-spacing: 0.01em;
   transition: color .2s, text-shadow .2s, transform .2s;
 }
-.poster-names a:hover { color: var(--accent-1); transform: scale(1.04);
-  text-shadow: 0 0 26px color-mix(in srgb, var(--accent-1) 60%, transparent); }
+.poster-names a:hover { color: var(--band-color, var(--accent-1)); transform: scale(1.04);
+  text-shadow: 0 0 26px color-mix(in srgb, var(--band-color, var(--accent-1)) 60%, transparent); }
 .poster-names a:has(.sub) { flex-wrap: wrap; justify-content: center; }
 /* headliner act drops onto its own full-width line, kept on a single centered line */
 .poster-names a.poster-headliner { flex-basis: 100%; margin-top: 0.2em; display: block; text-align: center; }
@@ -372,7 +378,16 @@ body::after {
 .poster-names a .sub { flex-basis: 100%; text-align: center;
   font-size: 0.5em; font-weight: 600; color: var(--text); letter-spacing: 0.03em;
   transition: color .2s, text-shadow .2s; }
-.poster-names a:hover .sub { color: var(--accent-1); }
+.poster-names a:hover .sub { color: var(--band-color, var(--accent-1)); }
+
+/* stage / sound / lights credits under the lineup poster */
+.lineup-credits {
+  max-width: 40rem; margin: 1.6rem auto 0; text-align: center;
+  font-family: var(--font-mono); font-size: 1.2rem; line-height: 1.6;
+  letter-spacing: 0.02em; color: var(--muted);
+}
+.lineup-credits a { color: var(--accent-1); text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--accent-1) 50%, transparent); }
+.lineup-credits a:hover { color: var(--accent-2); border-bottom-color: var(--accent-2); }
 
 /* ---------------------------------------------------------------------------
    Schedule
@@ -423,7 +438,7 @@ body::after {
   font-size: clamp(1.1rem, 1.7vw, 1.6rem); color: var(--text);
   transition: color .2s, text-shadow .2s;
 }
-.ticket a.act:hover { color: var(--accent-1); text-shadow: 0 0 16px color-mix(in srgb, var(--accent-1) 55%, transparent); }
+.ticket a.act:hover { color: var(--band-color, var(--accent-1)); text-shadow: 0 0 16px color-mix(in srgb, var(--band-color, var(--accent-1)) 55%, transparent); }
 .ticket .act.headliner { font-size: clamp(1.4rem, 2.3vw, 2.1rem); color: #fff;
   text-shadow: 0 0 14px var(--accent-1); }
 .ticket .act .sub { font-size: 0.6em; font-weight: 700; margin-left: 0.35em; }

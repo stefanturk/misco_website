@@ -7,17 +7,29 @@ window.MISCO_BANDS = {
   'Wabsy': '#',
   'Dogwater': '#',
   'Hot Hawaiian String Band': '#',
-  '2K House Band': '#',
+  '2K House Band': 'https://2kfest.com/',
   'The Real Experience': '#',
   'Mezcal Lynn': '#',
-  'Trianna Furuza & The Heavy Hitters': '#',
+  'Trianna and the Heavy Hitters': 'https://www.triannaferuza.com/',
   'Rourke': '#',
-  'Space Goat': '#'
+  'Space Goat': '#',
+  'Flunkyball Finals': 'https://en.wikipedia.org/wiki/Flunkyball'
 };
 
 (function () {
+  // Stable per-name "random" hue so each act lights up its own color on hover
+  // (and the same color across the lineup + schedule pages).
+  function hueFor(name) {
+    var h = 0;
+    for (var i = 0; i < name.length; i++) { h = (h * 31 + name.charCodeAt(i)) % 360; }
+    return h;
+  }
+
   document.querySelectorAll('[data-band]').forEach(function (el) {
-    var url = window.MISCO_BANDS[el.getAttribute('data-band')];
+    var name = el.getAttribute('data-band');
+    el.style.setProperty('--band-color', 'hsl(' + hueFor(name) + ' 85% 62%)');
+
+    var url = window.MISCO_BANDS[name];
     if (!url) return;
     el.setAttribute('href', url);
     if (url !== '#') { el.setAttribute('target', '_blank'); el.setAttribute('rel', 'noopener'); }
