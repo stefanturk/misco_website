@@ -315,6 +315,17 @@ function doPost(e) {
       arrival: String(data.arrival || '')
     };
 
+    // Block a second RSVP from an email that's already in the sheet (case-insensitive).
+    var email = guest.email.toLowerCase();
+    if (email && email.indexOf('@') !== -1) {
+      var existing = getGuests_();
+      for (var i = 0; i < existing.length; i++) {
+        if (existing[i].email.trim().toLowerCase() === email) {
+          return json_({ ok: false, error: 'duplicate' });
+        }
+      }
+    }
+
     var stamp = Utilities.formatDate(new Date(), 'America/Los_Angeles', "M/d/yyyy h a 'PT'");
     getSheet_().appendRow([
       stamp,

@@ -70,6 +70,9 @@
     if (PASSWORDS.indexOf(pw.value.trim().toLowerCase()) !== -1) {
       gate.classList.add('hidden');
       form.classList.remove('hidden');
+      var who = document.getElementById('who-coming');
+      if (who) who.classList.remove('hidden');
+      loadGuests();
     } else {
       gateStatus.textContent = 'Wrong password — try again.';
       pw.value = '';
@@ -115,6 +118,10 @@
           form.classList.add('hidden');
           thanks.classList.remove('hidden');
           window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else if (res && res.error === 'duplicate') {
+          status.className = 'form-status error';
+          status.textContent = 'That email has already submitted an RSVP. Want to make changes? Contact Alex — text (650) 235-5059.';
+          submitBtn.disabled = false;
         } else {
           throw new Error((res && res.error) || 'unknown error');
         }
