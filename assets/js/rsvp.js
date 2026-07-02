@@ -57,7 +57,7 @@
 
   function showLoading() {
     if (teaserCount) teaserCount.textContent = 'Loading…';
-    if (teaserList) teaserList.innerHTML = '<li class="teaser-empty">Loading who’s coming…</li>';
+    if (teaserList) teaserList.innerHTML = '<li class="teaser-empty">Loading…</li>';
   }
 
   function loadGuests() {
