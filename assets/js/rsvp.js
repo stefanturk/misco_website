@@ -19,8 +19,6 @@
   var submitBtn = document.getElementById('submit-btn');
   var teaserCount = document.getElementById('teaser-count');
   var teaserList = document.getElementById('teaser-list');
-  var thanksCount = document.getElementById('thanks-count');
-  var thanksList = document.getElementById('thanks-list');
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -55,15 +53,23 @@
     var guests = (data && data.guests) || [];
     var count = (data && typeof data.count === 'number') ? data.count : guests.length;
     fillList(teaserCount, teaserList, guests, count);
-    fillList(thanksCount, thanksList, guests, count);
+  }
+
+  function showLoading() {
+    if (teaserCount) teaserCount.textContent = 'Loading…';
+    if (teaserList) teaserList.innerHTML = '<li class="teaser-empty">Loading who’s coming…</li>';
   }
 
   function loadGuests() {
     if (!APPS_SCRIPT_URL) return;
+    showLoading();
     fetch(APPS_SCRIPT_URL)
       .then(function (r) { return r.json(); })
       .then(renderTeaser)
-      .catch(function () {});
+      .catch(function () {
+        if (teaserCount) teaserCount.textContent = '';
+        if (teaserList) teaserList.innerHTML = '<li class="teaser-empty">Couldn’t load the list — refresh to try again.</li>';
+      });
   }
 
   function unlock() {
