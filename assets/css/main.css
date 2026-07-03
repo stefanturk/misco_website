@@ -472,14 +472,14 @@ body::after {
   border: 1px solid var(--line); border-radius: 6px; overflow: hidden;
   background: var(--card); transition: transform .28s ease, box-shadow .28s ease;
 }
-/* 2x popout on hover — lifts up toward center, solid background so it's easy to see */
+/* subtle ~10% popout on hover — small lift, solid background so it's easy to see */
 .amenity-card:hover {
-  transform: scale(2) translateY(-12%); z-index: 50;
+  transform: scale(1.1) translateY(-2%); z-index: 50;
   background: var(--bg);
   box-shadow: 0 24px 70px rgba(0,0,0,0.8), 0 0 50px color-mix(in srgb, var(--accent-1) 30%, transparent);
 }
 .amenity-card:hover .amenity-photo { filter: brightness(0.95) saturate(1.05); }
-@media (max-width: 760px) { .amenity-grid { grid-template-columns: 1fr 1fr; } .amenity-card:hover { transform: scale(1.5) translateY(-8%); } }
+@media (max-width: 760px) { .amenity-grid { grid-template-columns: 1fr 1fr; } .amenity-card:hover { transform: scale(1.1) translateY(-2%); } }
 @media (max-width: 460px) { .amenity-grid { grid-template-columns: 1fr; } .amenity-card:hover { transform: scale(1.12); } }
 .amenity-photo {
   height: 170px; background-size: cover; background-position: center;
