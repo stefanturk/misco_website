@@ -3,7 +3,7 @@
    two pages stay in sync. Unknown sites use "#" until we have the URL. */
 window.MISCO_BANDS = {
   'Litty deBungus': 'https://littyd.com',
-  'Pabsy': '#',
+  'Pabsy': 'https://linktr.ee/pabsy?utm_source=linktree_profile_share&ltsid=b235726f-906d-4a8e-b705-157fb3ab93d5',
   'Wabsy': '#',
   'Dogwater': '#',
   'Hot Hawaiian String Band': '#',
