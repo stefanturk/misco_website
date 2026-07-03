@@ -377,6 +377,9 @@ body::after {
   font-size: clamp(2.25rem, 5.1vw, 3.9rem); letter-spacing: 0.01em;
   transition: color .2s, text-shadow .2s, transform .2s;
 }
+/* alternate names sit slightly greyer so adjacent acts are easy to tell apart
+   (hover still overrides to the band color below) */
+.poster-line a:nth-child(even) { color: color-mix(in srgb, var(--text) 55%, transparent); }
 .poster-names a:hover { color: var(--band-color, var(--accent-1)); transform: scale(1.04);
   text-shadow: 0 0 26px color-mix(in srgb, var(--band-color, var(--accent-1)) 60%, transparent); }
 .poster-names a:has(.sub) { flex-wrap: wrap; justify-content: center; }
