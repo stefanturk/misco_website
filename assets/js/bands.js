@@ -37,4 +37,10 @@ window.MISCO_BANDS = {
     el.setAttribute('target', '_blank');
     el.setAttribute('rel', 'noopener');
   });
+
+  // Grey every other lineup name in document order (across rows, not per row) so
+  // adjacent acts are easy to tell apart. Hover still lights each one up.
+  document.querySelectorAll('.poster-names [data-band]').forEach(function (el, i) {
+    if (i % 2 === 1) el.classList.add('poster-alt');
+  });
 })();
