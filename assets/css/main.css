@@ -148,6 +148,14 @@ body::after {
   color: var(--text);
   text-shadow: 0 0 10px color-mix(in srgb, var(--accent-1) 70%, transparent);
 }
+.nav-brand .brand-edition {
+  font-size: 0.55em;
+  font-weight: 900;
+  color: var(--accent-3);
+  vertical-align: top;
+  margin-right: 0.15em;
+  text-shadow: 0 0 8px color-mix(in srgb, var(--accent-3) 70%, transparent);
+}
 .nav-links { display: flex; gap: 1.5rem; align-items: center; }
 .nav-links a {
   font-family: var(--font-mono);
