@@ -265,19 +265,23 @@ function getSheet_() {
 /**
  * Append an RSVP directly under the last real guest.
  *
- * appendRow() writes after the last row with content in ANY column, so stray
- * junk far down the sheet (leftover formatting, a lone space, a stretched
- * validation range) leaves a gap. Instead we find the last non-empty Name cell
- * (column 2 — every real RSVP fills it) and write on the very next row.
+ * appendRow() writes after the last row with content in ANY column — including
+ * the admin checkboxes in G–I — so it skipped past them and left a gap. Instead
+ * we only look at the RSVP data columns A–F (Timestamp…Arrival): a row is
+ * "taken" if ANY of those six cells has content. The new row goes right after
+ * the last taken row, ignoring whatever lives in G onward.
  */
+var GUEST_COLS = 6; // A(Timestamp) … F(Arrival); G–I are admin checkboxes
 function appendGuestRow_(sh, values) {
   var maxRows = sh.getMaxRows();
-  var names = sh.getRange(1, 2, maxRows, 1).getValues(); // column B, all rows
-  var lastData = 1; // header row always counts as row 1
-  for (var i = 0; i < names.length; i++) {
-    if (String(names[i][0]).trim() !== '') lastData = i + 1;
+  var data = sh.getRange(1, 1, maxRows, GUEST_COLS).getValues(); // A–F, all rows
+  var lastTaken = 0;
+  for (var r = 0; r < data.length; r++) {
+    for (var c = 0; c < GUEST_COLS; c++) {
+      if (String(data[r][c]).trim() !== '') { lastTaken = r + 1; break; }
+    }
   }
-  var target = lastData + 1;
+  var target = lastTaken + 1;
   if (target > maxRows) sh.insertRowAfter(maxRows);
   sh.getRange(target, 1, 1, values.length).setValues([values]);
 }
