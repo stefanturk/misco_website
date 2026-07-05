@@ -380,11 +380,14 @@ function doPost(e) {
   }
 }
 
-/** Guest list for the website teaser: { count, guests: [{name, arrival}] }. */
+/** Guest list for the website teaser: { count, guests: [{name, arrival}] }.
+ *  Newest first: rows are appended in chronological order, so reversing puts the
+ *  most recent RSVP at the top (ties within the same timestamp don't matter). */
 function doGet() {
   var guests = getGuests_().map(function (g) {
     return { name: g.name, arrival: g.arrival };
   });
+  guests.reverse();
   return json_({ count: guests.length, guests: guests });
 }
 
