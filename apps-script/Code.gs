@@ -262,6 +262,26 @@ function getSheet_() {
   return sh;
 }
 
+/**
+ * Append an RSVP directly under the last real guest.
+ *
+ * appendRow() writes after the last row with content in ANY column, so stray
+ * junk far down the sheet (leftover formatting, a lone space, a stretched
+ * validation range) leaves a gap. Instead we find the last non-empty Name cell
+ * (column 2 — every real RSVP fills it) and write on the very next row.
+ */
+function appendGuestRow_(sh, values) {
+  var maxRows = sh.getMaxRows();
+  var names = sh.getRange(1, 2, maxRows, 1).getValues(); // column B, all rows
+  var lastData = 1; // header row always counts as row 1
+  for (var i = 0; i < names.length; i++) {
+    if (String(names[i][0]).trim() !== '') lastData = i + 1;
+  }
+  var target = lastData + 1;
+  if (target > maxRows) sh.insertRowAfter(maxRows);
+  sh.getRange(target, 1, 1, values.length).setValues([values]);
+}
+
 /** All RSVPs as [{name,email,bunk,venmo,arrival}], skipping header/blank rows. */
 function getGuests_() {
   var sh = getSheet_();
@@ -327,7 +347,7 @@ function doPost(e) {
     }
 
     var stamp = Utilities.formatDate(new Date(), 'America/Los_Angeles', "M/d/yyyy h a 'PT'");
-    getSheet_().appendRow([
+    appendGuestRow_(getSheet_(), [
       stamp,
       guest.name,
       guest.email,
