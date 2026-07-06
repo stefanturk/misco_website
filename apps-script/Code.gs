@@ -27,6 +27,8 @@
  * ── EMAIL ────────────────────────────────────────────────────────────────────
  *  Emails send from misco@littyd.com via Resend (littyd.com must stay verified in
  *  Resend). The key lives in Script Properties (step 4) — never in the public site.
+ *  (To switch the sender to tickets@campmisco.com later, see the FROM line in Config —
+ *   it needs campmisco.com verified in Resend, which is a paid add-on.)
  *  • The copy for the 3 emails lives in an "Emails" TAB in this spreadsheet, so anyone
  *    can edit Subject/Body without touching code. Run  Misco Emails ▸ Set up / reset
  *    "Emails" tab  once to create it (seeds the defaults below).
@@ -34,7 +36,9 @@
  *    the Body only, {recap} (the guest's own RSVP details). Start a line with "- " for
  *    a bullet; a blank line starts a new paragraph. Branding (header/footer) is added
  *    automatically. If the tab is missing/blank, the built-in defaults are used.
- *  • On RSVP: guest gets the "welcome" email, organizers get a notify (toggles below).
+ *  • On RSVP: guest gets the "welcome" email. Founders are NOT emailed per-RSVP —
+ *    instead they get a milestone recap every 10th RSVP (10, 20, 30, …) with the
+ *    running count, the newest 10 names, and a link to the full sheet (toggles below).
  *  • Misco Emails menu ▸ Test to founders ▸ (Welcome / Getting Close / Day Of) sends a
  *    preview to the founders so you can check the format before the real blast.
  *  • Misco Emails menu ▸ Send to EVERYONE ▸ (…) does the real de-duplicated batch send.
@@ -48,14 +52,17 @@ var HEADERS = ['Timestamp', 'Name', 'Email', 'Bunk or Camping', 'Venmo Handle', 
 var PASSWORDS = ['burgershack', 'bugershack']; // accepted on submit; matches the website gate
 
 var FROM = 'Camp Misco <misco@littyd.com>';            // must be a Resend-verified domain
+// To send from tickets@campmisco.com instead: verify campmisco.com in Resend (needs a
+// paid plan — Resend charges ~$20/mo for a 2nd domain/address), then swap the line above
+// for:  var FROM = 'Camp Misco <tickets@campmisco.com>';
 var REPLY_TO = 'stefanturkowski@gmail.com';            // guest replies land here
-var FOUNDERS = ['oodsigma28@gmail.com', 'stefanturkowski@gmail.com']; // test previews + RSVP notices
-var ADMIN_TO = FOUNDERS;                               // notify on each RSVP
+var FOUNDERS = ['oodsigma28@gmail.com', 'stefanturkowski@gmail.com']; // milestone recaps + test previews
 var SITE_URL = 'https://campmisco.com/';
 var VENMO = '@alex-youngberg';
 
-var SEND_WELCOME_ON_RSVP = true; // email the guest a "ticket" the moment they RSVP
-var SEND_ADMIN_NOTIFY = true;    // email the organizers on each RSVP
+var SEND_WELCOME_ON_RSVP = true;          // email the guest a "ticket" the moment they RSVP
+var NOTIFY_FOUNDERS_ON_MILESTONE = true;  // email founders a recap every Nth RSVP (not every RSVP)
+var MILESTONE_EVERY = 10;                 // 10, 20, 30, … RSVPs triggers a founder recap
 
 // ── DEFAULT EMAIL COPY ─────────────────────────────────────────────────────────
 // Seeds the "Emails" tab and is the fallback if that tab is missing/blank. Edit the
@@ -214,16 +221,22 @@ function renderEmail_(key, g) {
   return { subject: subjectTokens_(c.subject, g), html: wrapEmail_(bodyToHtml_(c.body, g)) };
 }
 
-function adminNotifyHtml_(g) {
+/** Founder milestone recap: running count, newest N names (newest first), link to all. */
+function milestoneNotifyHtml_(count, newest) {
+  var url = SpreadsheetApp.getActiveSpreadsheet().getUrl();
+  var rows = newest.map(function (g, i) {
+    return '<tr>' +
+      '<td style="padding:6px 12px 6px 0;color:#9b86bf;width:24px;text-align:right;">' + (i + 1) + '</td>' +
+      '<td style="padding:6px 0;">' + esc_(g.name) +
+        (g.arrival ? ' <span style="color:#9b86bf;">· ' + esc_(g.arrival) + '</span>' : '') +
+      '</td></tr>';
+  }).join('');
   return wrapEmail_(
-    '<h1 style="font-size:20px;margin:0 0 12px;color:#fff;">New RSVP</h1>' +
-    '<table style="width:100%;border-collapse:collapse;font-size:14px;">' +
-      '<tr><td style="padding:6px 0;color:#9b86bf;width:130px;">Name</td><td style="padding:6px 0;">' + esc_(g.name) + '</td></tr>' +
-      '<tr><td style="padding:6px 0;color:#9b86bf;">Email</td><td style="padding:6px 0;">' + esc_(g.email || '—') + '</td></tr>' +
-      '<tr><td style="padding:6px 0;color:#9b86bf;">Sleeping</td><td style="padding:6px 0;">' + esc_(g.bunk || '—') + '</td></tr>' +
-      '<tr><td style="padding:6px 0;color:#9b86bf;">Venmo</td><td style="padding:6px 0;">' + esc_(g.venmo || '—') + '</td></tr>' +
-      '<tr><td style="padding:6px 0;color:#9b86bf;">Arriving</td><td style="padding:6px 0;">' + esc_(g.arrival || '—') + '</td></tr>' +
-    '</table>'
+    '<h1 style="font-size:22px;margin:0 0 6px;color:#fff;">🎉 ' + count + ' people are in!</h1>' +
+    '<p style="margin:0 0 20px;">Camp Misco just crossed <strong>' + count + '</strong> RSVPs.</p>' +
+    '<p style="margin:0 0 8px;color:#9b86bf;font-size:12px;letter-spacing:2px;">NEWEST ' + newest.length + '</p>' +
+    '<table style="width:100%;border-collapse:collapse;font-size:14px;margin:0 0 22px;">' + rows + '</table>' +
+    '<p style="margin:0;"><a href="' + url + '" style="color:#ff84c4;font-weight:bold;">See everyone who\'s coming →</a></p>'
   );
 }
 
@@ -367,8 +380,16 @@ function doPost(e) {
         var w = renderEmail_('welcome', guest);
         sendEmail_(guest.email, w.subject, w.html);
       }
-      if (SEND_ADMIN_NOTIFY) {
-        sendEmail_(ADMIN_TO, 'New Camp Misco RSVP — ' + guest.name, adminNotifyHtml_(guest));
+      // Founders get a recap only when this RSVP lands on a multiple of MILESTONE_EVERY
+      // (10, 20, 30, …) — not on every RSVP. RSVPs are append-only and duplicates are
+      // blocked above, so count % N === 0 fires exactly once per milestone.
+      if (NOTIFY_FOUNDERS_ON_MILESTONE) {
+        var all = getGuests_();
+        var count = all.length;
+        if (count > 0 && count % MILESTONE_EVERY === 0) {
+          var newest = all.slice(-MILESTONE_EVERY).reverse(); // newest first
+          sendEmail_(FOUNDERS, '🎉 ' + count + ' RSVPs for Camp Misco', milestoneNotifyHtml_(count, newest));
+        }
       }
     } catch (mailErr) {
       Logger.log('email error (ignored): ' + mailErr);
