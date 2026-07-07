@@ -55,7 +55,7 @@ var FROM = 'Camp Misco <misco@littyd.com>';            // must be a Resend-verif
 // To send from tickets@campmisco.com instead: verify campmisco.com in Resend (needs a
 // paid plan — Resend charges ~$20/mo for a 2nd domain/address), then swap the line above
 // for:  var FROM = 'Camp Misco <tickets@campmisco.com>';
-var REPLY_TO = 'stefanturkowski@gmail.com';            // guest replies land here
+var REPLY_TO = 'oodsigma28@gmail.com';                 // guest replies land here
 var FOUNDERS = ['oodsigma28@gmail.com', 'stefanturkowski@gmail.com']; // milestone recaps + test previews
 var SITE_URL = 'https://campmisco.com/';
 var VENMO = '@alex-youngberg';
