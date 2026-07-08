@@ -429,16 +429,16 @@ body::after {
 .ticket.dur-15 { min-height: 132px; }
 /* the torn stub */
 .ticket .stub {
-  flex: 0 0 62px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+  flex: 0 0 72px; display: flex; flex-direction: column; justify-content: center; align-items: center;
   text-align: center; padding: 0.4rem 0.3rem; gap: 0.15rem;
   background: color-mix(in srgb, var(--time-blue) 12%, transparent);
   border-right: 2px dashed color-mix(in srgb, var(--accent-1) 45%, transparent);
 }
 .ticket .stub .time {
-  font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.02em; color: var(--time-blue);
+  font-family: var(--font-mono); font-size: 1.02rem; letter-spacing: 0.02em; color: #fff; font-weight: 700;
   text-shadow: 0 0 10px color-mix(in srgb, var(--time-blue) 60%, transparent);
 }
-.ticket .stub .dur { font-family: var(--font-mono); font-size: 0.58rem; color: var(--muted); letter-spacing: 0.04em; }
+.ticket .stub .dur { font-family: var(--font-mono); font-size: 0.74rem; color: #fff; letter-spacing: 0.04em; }
 /* main billing — band name is the biggest element */
 .ticket .ticket-main {
   flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 0.35rem;

@@ -13,6 +13,7 @@ window.MISCO_BANDS = {
   'Trianna and the Heavy Hitters': 'https://www.triannaferuza.com/',
   'Rourke': '#',
   'Space Goat': '#',
+  'Professor P': '#',
   'Flunkyball Finals': 'https://en.wikipedia.org/wiki/Flunkyball'
 };
 
@@ -38,9 +39,8 @@ window.MISCO_BANDS = {
     el.setAttribute('rel', 'noopener');
   });
 
-  // Grey every other lineup name in document order (across rows, not per row) so
-  // adjacent acts are easy to tell apart. Hover still lights each one up.
-  document.querySelectorAll('.poster-names [data-band]').forEach(function (el, i) {
-    if (i % 2 === 1) el.classList.add('poster-alt');
-  });
+  // Lineup greys are set explicitly via the `poster-alt` class in lineup.html so
+  // adjacent acts are easy to tell apart. (We used to alternate here in document
+  // order, but adding an act mid-list flips every colour after it — the fixed
+  // classes let each act keep its intended shade. Hover still lights each up.)
 })();
