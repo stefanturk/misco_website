@@ -14,6 +14,7 @@ window.MISCO_BANDS = {
   'Rourke': '#',
   'Space Goat': '#',
   'Professor P': '#',
+  'DJ Robert': '#',
   'Flunkyball Finals': 'https://en.wikipedia.org/wiki/Flunkyball'
 };
 
