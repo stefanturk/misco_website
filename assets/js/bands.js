@@ -27,9 +27,15 @@ window.MISCO_BANDS = {
     return h;
   }
 
+  // Pin specific acts' glow hues (overrides the name-hash above). Litty and
+  // Pabsy are swapped from their hashed hues so Litty glows purple; Wabsy is
+  // pinned to Flunkyball's green (121).
+  var HUE_OVERRIDES = { 'Litty deBungus': 271, 'Pabsy': 15, 'Wabsy': 121 };
+
   document.querySelectorAll('[data-band]').forEach(function (el) {
     var name = el.getAttribute('data-band');
-    el.style.setProperty('--band-color', 'hsl(' + hueFor(name) + ' 85% 62%)');
+    var hue = HUE_OVERRIDES.hasOwnProperty(name) ? HUE_OVERRIDES[name] : hueFor(name);
+    el.style.setProperty('--band-color', 'hsl(' + hue + ' 85% 62%)');
 
     // Only make it a real link if we have an actual URL. '#' placeholders and
     // unlisted acts stay non-clickable (an <a> without href isn't a link).

@@ -452,6 +452,8 @@ body::after {
 .ticket:hover .act { color: var(--band-color, var(--accent-1)); text-shadow: 0 0 16px color-mix(in srgb, var(--band-color, var(--accent-1)) 55%, transparent); }
 .ticket .act.headliner { font-size: clamp(1.4rem, 2.3vw, 2.1rem); color: #fff;
   text-shadow: 0 0 14px var(--accent-1); }
+.ticket:hover .act.headliner { color: var(--band-color, var(--accent-1));
+  text-shadow: 0 0 20px color-mix(in srgb, var(--band-color, var(--accent-1)) 60%, transparent); }
 .ticket .act .sub { font-size: 0.6em; font-weight: 700; margin-left: 0.35em; }
 .ticket .where {
   align-self: flex-start;
