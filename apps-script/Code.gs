@@ -215,10 +215,36 @@ function getEmailContent_(key) {
   return { subject: d.subject, body: d.body };
 }
 
-/** {subject, html} for a template + guest, using the live (or default) copy. */
+/** A faux "ticket scan" stub: a QR (rickroll) under an ADMIT ONE header, so the
+ *  welcome email reads like a real ticket. The QR image is self-hosted on the
+ *  site (photos/ticket-qr.png) — Gmail strips inline SVG/data-URI images, but a
+ *  stable https URL renders (and gets proxied/cached) reliably. */
+function ticketQrHtml_(g) {
+  var serial = 'CM4-' + String(Math.abs(hashCode_(String(g.email || g.name || 'guest'))) % 100000 + 100000).slice(1);
+  return '' +
+    '<div style="margin:26px 0 4px;padding:22px;border:2px dashed #6a4a9c;border-radius:12px;background:#0e0a16;text-align:center;">' +
+      '<div style="font-size:12px;letter-spacing:4px;color:#ff84c4;font-weight:800;">ADMIT ONE</div>' +
+      '<div style="font-size:11px;letter-spacing:2px;color:#9b86bf;margin-top:4px;">CAMP MISCO 4 · SCAN AT GATE</div>' +
+      '<img src="' + SITE_URL + 'photos/ticket-qr.png" alt="Entry QR code" width="180" height="180" ' +
+        'style="display:block;margin:16px auto;width:180px;height:180px;border-radius:8px;background:#fff;" />' +
+      '<div style="font-family:monospace;font-size:12px;letter-spacing:2px;color:#9b86bf;">No. ' + serial + '</div>' +
+    '</div>';
+}
+
+/** Small stable hash for a printable ticket serial. */
+function hashCode_(s) {
+  var h = 0;
+  for (var i = 0; i < s.length; i++) { h = (h * 31 + s.charCodeAt(i)) | 0; }
+  return h;
+}
+
+/** {subject, html} for a template + guest, using the live (or default) copy.
+ *  The welcome email gets a faux "ticket scan" QR stub appended at the bottom. */
 function renderEmail_(key, g) {
   var c = getEmailContent_(key);
-  return { subject: subjectTokens_(c.subject, g), html: wrapEmail_(bodyToHtml_(c.body, g)) };
+  var inner = bodyToHtml_(c.body, g);
+  if (key === 'welcome') inner += ticketQrHtml_(g);
+  return { subject: subjectTokens_(c.subject, g), html: wrapEmail_(inner) };
 }
 
 /** Founder milestone recap: running count, newest N names (newest first), link to all. */
