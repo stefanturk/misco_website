@@ -9,6 +9,7 @@ window.MISCO_BANDS = {
   '2K House Band': 'https://2kfest.com/',
   'The Real Experience': '#',
   'Mezcal Lynn': '#',
+  'DJ Sally': '#',
   'Trianna and the Heavy Hitters': 'https://www.triannaferuza.com/',
   'Rourke': '#',
   'Space Goat': '#',
