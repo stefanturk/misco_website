@@ -5,7 +5,6 @@ window.MISCO_BANDS = {
   'Litty deBungus': 'https://littyd.com',
   'Pabsy': 'https://pabsy.bandcamp.com/',
   'Wabsy': '#',
-  'Dogwater': '#',
   'Hot Hawaiian String Band': '#',
   '2K House Band': 'https://2kfest.com/',
   'The Real Experience': '#',
