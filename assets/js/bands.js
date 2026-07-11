@@ -27,15 +27,23 @@ window.MISCO_BANDS = {
     return h;
   }
 
-  // Pin specific acts' glow hues (overrides the name-hash above). Litty and
-  // Pabsy are swapped from their hashed hues so Litty glows purple; Wabsy is
-  // pinned to Flunkyball's green (121).
-  var HUE_OVERRIDES = { 'Litty deBungus': 271, 'Pabsy': 15, 'Wabsy': 121 };
+  // Pin specific acts' glow colours (overrides the name-hash above). A number is
+  // treated as a hue (rendered at 85% sat, 62% light); a string is used as the CSS
+  // colour verbatim. Litty/Pabsy are swapped so Litty glows purple; Wabsy matches
+  // Flunkyball's green (121); the four Jams glow their fruit (cream "a la mode"
+  // needs low saturation, so it's a full colour rather than a hue).
+  var COLOR_OVERRIDES = {
+    'Litty deBungus': 271, 'Pabsy': 15, 'Wabsy': 121,
+    'Jam (Strawberry)': 350,
+    'Jam (Blackberry)': 278,
+    'Jam (Peach)': 'hsl(24 90% 70%)',
+    'Jam Jam (a la mode)': 'hsl(45 70% 82%)'
+  };
 
   document.querySelectorAll('[data-band]').forEach(function (el) {
     var name = el.getAttribute('data-band');
-    var hue = HUE_OVERRIDES.hasOwnProperty(name) ? HUE_OVERRIDES[name] : hueFor(name);
-    el.style.setProperty('--band-color', 'hsl(' + hue + ' 85% 62%)');
+    var ov = COLOR_OVERRIDES.hasOwnProperty(name) ? COLOR_OVERRIDES[name] : hueFor(name);
+    el.style.setProperty('--band-color', (typeof ov === 'string') ? ov : 'hsl(' + ov + ' 85% 62%)');
 
     // Only make it a real link if we have an actual URL. '#' placeholders and
     // unlisted acts stay non-clickable (an <a> without href isn't a link).
