@@ -38,6 +38,15 @@
     <p class="section-eyebrow center">Camp Misco 4 · Sept 25–27 · Murphys, CA</p>
     <h1 class="section-title glow center" style="margin-bottom:2rem">RSVP</h1>
 
+    <!-- Who's coming (shown once unlocked; stays put through submit) -->
+    <div class="hidden" id="who-coming">
+      <h2 class="section-eyebrow center" style="margin-top:0">Who's coming</h2>
+      <div class="rsvp-teaser">
+        <div class="teaser-count" id="teaser-count"></div>
+        <ul class="teaser-list" id="teaser-list"></ul>
+      </div>
+    </div>
+
     <!-- Password gate -->
     <div class="gate" id="gate">
       <div class="field">
@@ -101,16 +110,7 @@
     <!-- Thank-you (hidden until submitted) -->
     <div class="thanks hidden" id="thanks">
       <h2 class="neon" style="font-size:clamp(2rem,7vw,4rem)">You're in!</h2>
-      <p class="lead center">Your RSVP is in! Scroll down to see the other homies going. 🎉</p>
-    </div>
-
-    <!-- Who's coming (shown once unlocked) -->
-    <div class="hidden" id="who-coming">
-      <h2 class="section-eyebrow center" style="margin-top:2.5rem">Who's coming</h2>
-      <div class="rsvp-teaser">
-        <div class="teaser-count" id="teaser-count"></div>
-        <ul class="teaser-list" id="teaser-list"></ul>
-      </div>
+      <p class="lead center">Your RSVP is in! See the other homies going up top. 🎉</p>
     </div>
   </main>
 
