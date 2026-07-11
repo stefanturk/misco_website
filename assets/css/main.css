@@ -388,6 +388,8 @@ body::after {
   font-size: 0.5em; font-weight: 600; color: var(--text); letter-spacing: 0.03em;
   transition: color .2s, text-shadow .2s; }
 .poster-names a:hover .sub { color: var(--band-color, var(--accent-1)); }
+/* a sub that sits inline to the right of the name instead of dropping below it */
+.poster-names a .sub.sub-side { flex-basis: auto; text-align: left; }
 
 /* stage / sound / lights credits under the lineup poster */
 .lineup-credits {
