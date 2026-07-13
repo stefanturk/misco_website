@@ -56,6 +56,20 @@
   --wave-light: 58%;
 }
 
+/* BLACKLIGHT (Saturday night) — late-night UV. Pinned (theme.js randomizes the
+   Spice accents per load, so the night column needs its own to stay distinct). */
+.theme-blacklight {
+  --bg-soft:   #0a0416;
+  --text:      #f4ecff;
+  --muted:     #bda8d9;
+  --accent-1:  #b026ff; /* ultraviolet */
+  --accent-2:  #ccff00; /* acid lime   */
+  --accent-3:  #00e5ff;
+  --line:      rgba(176, 38, 255, 0.22);
+  --card:      rgba(176, 38, 255, 0.05);
+  --time-blue: #8b5cf6;
+}
+
 /* ---------------------------------------------------------------------------
    Base
    --------------------------------------------------------------------------- */
