@@ -517,7 +517,7 @@ body::after {
 
 /* Full site map — same framed card + hover popout as the amenities, but the
    whole image shows (no cover-crop) so it's readable end to end. */
-.map-card { max-width: 780px; margin: 2.4rem auto 0; }
+.map-card { max-width: 900px; margin: 2.4rem auto 0; }
 .map-photo { display: block; width: 100%; height: auto; filter: brightness(0.92) saturate(1.03); transition: filter .28s ease; }
 .map-card:hover .map-photo { filter: brightness(1) saturate(1.05); }
 
