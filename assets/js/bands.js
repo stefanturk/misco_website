@@ -11,11 +11,13 @@ window.MISCO_BANDS = {
   'The Real Experience': '#',
   'Mezcal Lynn': '#',
   'DJ Sally': '#',
-  'Trianna and the Heavy Hitters': 'https://www.triannaferuza.com/',
+  'Trianna Feruza and the Heavy Hitters': 'https://www.triannaferuza.com/',
   'Rourke': '#',
   'Space Goat': '#',
   'Professor P': '#',
-  'DJ Robert': '#',
+  'DJ Wobert': '#',
+  'DJ Nobody': '#',
+  'DJ iPod': '#',
   'Flunkyball Finals': 'https://en.wikipedia.org/wiki/Flunkyball'
 };
 
