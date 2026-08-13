@@ -34,7 +34,7 @@
     bunkLabel.classList.remove('flash-red');
     void bunkLabel.offsetWidth; // reflow so the animation restarts each time
     bunkLabel.classList.add('flash-red');
-    setTimeout(function () { bunkLabel.classList.remove('flash-red'); }, 650);
+    setTimeout(function () { bunkLabel.classList.remove('flash-red'); }, 1250);
   }
 
   // Bunks are for both-night guests; they can also be closed off entirely once full.
