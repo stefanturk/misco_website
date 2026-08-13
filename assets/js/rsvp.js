@@ -3,7 +3,7 @@
    (No backend, no keys in the page.) */
 (function () {
   // ===== Manual toggles — flip, commit, push (no Apps Script redeploy needed) =====
-  var RSVP_CLOSED  = false;  // true → no new RSVPs (gate still unlocks the guest list only)
+  var RSVP_CLOSED  = true;  // true → no new RSVPs (gate still unlocks the guest list only)
   var BUNKS_CLOSED = true;  // true → all bunks reserved; bunk option greyed out for everyone
 
   // ▼▼▼ Apps Script Web app URL (ends in /exec) ▼▼▼
