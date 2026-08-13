@@ -35,7 +35,8 @@
  *  • In Subject/Body you can use tokens: {firstName} {arrival} {venmo} {site} and, in
  *    the Body only (each on its own line): {recap} (the guest's own RSVP details),
  *    {map} (festival map image), {schedule} (weekend schedule), {address} (venue
- *    callout). Start a line with "- " for
+ *    callout), {pay} (a Venmo nudge shown only if unpaid [col G] and not a musician
+ *    [col H]). Start a line with "- " for
  *    a bullet; a blank line starts a new paragraph. Branding (header/footer) is added
  *    automatically. If the tab is missing/blank, the built-in defaults are used.
  *  • On RSVP: guest gets the "welcome" email. Founders are NOT emailed per-RSVP —
@@ -123,7 +124,7 @@ var DEFAULT_EMAILS = {
       "You're on the list, {firstName}! 🪩\n\n" +
       "Consider this your ticket. Here's the plan we've got down for you:\n\n" +
       "{recap}\n" +
-      "Lock your spot: the weekend is $50 — Venmo {venmo} if you haven't already.\n\n" +
+      "{pay}\n" +
       "When: Friday Sept 25 – Sunday Sept 27, 2026\n" +
       "Where: Murphys, CA\n" +
       "The bit: Spice World / Double Feature — Friday Dune (1984), Saturday Spice World.\n\n" +
@@ -142,7 +143,7 @@ var DEFAULT_EMAILS = {
       "- Costumes encouraged for the double feature: Dune (1984) (Fri) & Spice World (Sat).\n\n" +
       "Your plan with us:\n\n" +
       "{recap}\n" +
-      "Haven't squared up? Venmo {venmo} ($50).\n\n" +
+      "{pay}\n" +
       "Check the schedule: {site}schedule.html\n\n" +
       "Here's the lay of the land — camping, stages, bathrooms, parking:\n\n" +
       "{map}\n" +
@@ -161,7 +162,7 @@ var DEFAULT_EMAILS = {
       "{schedule}\n" +
       "And where everything is:\n\n" +
       "{map}\n" +
-      "If you haven't paid: Venmo {venmo} ($50).\n\n" +
+      "{pay}\n" +
       "Don't reply to this email — text Alex at (650) 235-5059 if you get lost."
   }
 };
@@ -244,6 +245,19 @@ function scheduleHtml_() {
     '</div>';
 }
 
+/** {pay} block: a "please Venmo" nudge — shown ONLY if the guest hasn't paid (col G)
+ *  and isn't a musician (col H). Renders nothing otherwise, so paid folks and players
+ *  never see it. */
+function payHtml_(g) {
+  if (g && (g.paid || g.musician)) return '';
+  return '' +
+    '<div style="margin:0 0 16px;padding:14px 18px;border-left:3px solid #ffd23d;' +
+      'background:#231a08;border-radius:0 6px 6px 0;font-size:15px;color:#e9e1f7;">' +
+      'Haven\'t squared up yet? The weekend is <strong style="color:#fff;">$50</strong> — ' +
+      'Venmo <strong style="color:#ff84c4;">' + esc_(VENMO) + '</strong> to lock your spot.' +
+    '</div>';
+}
+
 /** {address} block: a prominent venue callout with a Google Maps link. */
 function addressHtml_() {
   var maps = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(VENUE_ADDRESS);
@@ -291,6 +305,7 @@ function bodyToHtml_(text, g) {
     if (trimmed === '{map}') { flush(); html += mapHtml_(); continue; }
     if (trimmed === '{schedule}') { flush(); html += scheduleHtml_(); continue; }
     if (trimmed === '{address}') { flush(); html += addressHtml_(); continue; }
+    if (trimmed === '{pay}') { flush(); html += payHtml_(g); continue; }
     if (trimmed === '') { flush(); continue; }
     if (/^[-•]\s+/.test(trimmed)) {
       bullets.push('<li style="margin:6px 0;">' + inlineTokens_(trimmed.replace(/^[-•]\s+/, ''), g) + '</li>');
@@ -433,14 +448,15 @@ function appendGuestRow_(sh, values) {
   sh.getRange(target, 1, 1, values.length).setValues([values]);
 }
 
-/** All RSVPs as [{name,email,bunk,venmo,arrival}], skipping header/blank rows. */
+/** All RSVPs as [{name,email,bunk,venmo,arrival,paid,musician}], skipping header/blank rows.
+ *  Cols: Timestamp,Name,Email,Bunk,Venmo,Arrival (A–F), then admin flags Paid (G) and
+ *  Musician (H) — checkbox TRUE or an affirmative word both count as set. */
 function getGuests_() {
   var sh = getSheet_();
   var last = sh.getLastRow();
   var guests = [];
   if (last > 1) {
-    // Timestamp,Name,Email,Bunk,Venmo,Arrival (cols 0..5)
-    var rows = sh.getRange(2, 1, last - 1, 6).getValues();
+    var rows = sh.getRange(2, 1, last - 1, 8).getValues(); // A..H
     for (var i = 0; i < rows.length; i++) {
       var nm = String(rows[i][1] || '').trim();
       if (!nm) continue;
@@ -451,11 +467,20 @@ function getGuests_() {
         email: String(rows[i][2] || '').trim(),
         bunk: String(rows[i][3] || ''),
         venmo: String(rows[i][4] || ''),
-        arrival: String(rows[i][5] || '')
+        arrival: String(rows[i][5] || ''),
+        paid: truthyCell_(rows[i][6]),      // column G
+        musician: truthyCell_(rows[i][7])   // column H
       });
     }
   }
   return guests;
+}
+
+/** Treat a checkbox TRUE, or an affirmative word (yes/y/x/✓/1/true/paid), as "set". */
+function truthyCell_(v) {
+  if (v === true) return true;
+  var s = String(v == null ? '' : v).trim().toLowerCase();
+  return s === 'true' || s === 'yes' || s === 'y' || s === 'x' || s === '✓' || s === '1' || s === 'paid';
 }
 
 /** "Spots left" flags from the "Website (No Touch)" tab. Best-effort: if the tab or
@@ -601,7 +626,7 @@ function setupEmailsSheet() {
   sh.activate();
   ui.alert('Ready',
     'The "Emails" tab is set up. Edit any Subject/Body cell to change what goes out — ' +
-    'no code needed. Tokens: {firstName} {arrival} {venmo} {site} {recap} {map} {schedule} {address}. ' +
+    'no code needed. Tokens: {firstName} {arrival} {venmo} {site} {recap} {map} {schedule} {address} {pay}. ' +
     'Start a line with "- " for a bullet.',
     ui.ButtonSet.OK);
 }
@@ -625,7 +650,7 @@ function ensureEmailsSheet_(reset) {
     sh.setColumnWidth(3, 560);
     sh.getRange(2, 2, rows.length, 2).setWrap(true).setVerticalAlignment('top');
     sh.getRange(rows.length + 3, 1).setValue(
-      'Tokens: {firstName} {arrival} {venmo} {site}  ·  body-only (own line): {recap} {map} {schedule} {address}  ·  ' +
+      'Tokens: {firstName} {arrival} {venmo} {site}  ·  body-only (own line): {recap} {map} {schedule} {address} {pay}  ·  ' +
       'start a line with "- " for a bullet  ·  blank line = new paragraph. ' +
       'The header/footer branding is added automatically.');
   }
