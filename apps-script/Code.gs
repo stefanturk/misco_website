@@ -64,15 +64,13 @@ var SEND_WELCOME_ON_RSVP = true;          // email the guest a "ticket" the mome
 var NOTIFY_FOUNDERS_ON_MILESTONE = true;  // email founders a recap every Nth RSVP (not every RSVP)
 var MILESTONE_EVERY = 10;                 // 10, 20, 30, … RSVPs triggers a founder recap
 
-// ── Live caps (read from the "Budget" tab; auto-close when hit) ─────────────────
-// The Budget tab already tallies these, so we read them straight from the bound
-// sheet — no credentials, no service account. Auto-close works ALONGSIDE the
-// website's manual BUNKS_CLOSED / RSVP_CLOSED switches (either one can close).
-var BUDGET_SHEET = 'Budget';
-var BUNK_COUNT_CELL = 'B21';   // live # of guests in bunks
-var TOTAL_COUNT_CELL = 'B17';  // live total # of people
-var BUNK_CAP = 14;             // bunks are full once the count reaches this
-var TOTAL_CAP = 70;            // RSVP closes once the total reaches this
+// ── Live caps (read from the "Website (No Touch)" tab; auto-close at 0) ─────────
+// The spreadsheet computes what's left; we just check it's still above 0. Read
+// straight from the bound sheet — no credentials, no service account. Works
+// ALONGSIDE the website's manual BUNKS_CLOSED / RSVP_CLOSED switches (either closes).
+var CAPS_SHEET = 'Website (No Touch)';
+var SPOTS_LEFT_CELL = 'B2';   // total spots remaining → RSVP closes at 0 or below
+var BUNKS_LEFT_CELL = 'B3';   // bunks remaining → bunks close at 0 or below
 
 // ── DEFAULT EMAIL COPY ─────────────────────────────────────────────────────────
 // Seeds the "Emails" tab and is the fallback if that tab is missing/blank. Edit the
@@ -360,17 +358,18 @@ function getGuests_() {
   return guests;
 }
 
-/** Live counts + fullness flags from the "Budget" tab. Best-effort: if the tab or
- *  cells can't be read, nothing is treated as full (fail OPEN, never block on error). */
+/** "Spots left" flags from the "Website (No Touch)" tab. Best-effort: if the tab or
+ *  cells can't be read as numbers, nothing is treated as full (fail OPEN, never
+ *  block on error). Full when the remaining count is 0 or negative. */
 function getCaps_() {
-  var caps = { bunks: null, total: null, bunksFull: false, rsvpFull: false };
+  var caps = { spotsLeft: null, bunksLeft: null, bunksFull: false, rsvpFull: false };
   try {
-    var b = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(BUDGET_SHEET);
-    if (b) {
-      var bunks = Number(b.getRange(BUNK_COUNT_CELL).getValue());
-      var total = Number(b.getRange(TOTAL_COUNT_CELL).getValue());
-      if (!isNaN(bunks)) { caps.bunks = bunks; caps.bunksFull = bunks >= BUNK_CAP; }
-      if (!isNaN(total)) { caps.total = total; caps.rsvpFull = total >= TOTAL_CAP; }
+    var s = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CAPS_SHEET);
+    if (s) {
+      var spots = Number(s.getRange(SPOTS_LEFT_CELL).getValue());
+      var bunks = Number(s.getRange(BUNKS_LEFT_CELL).getValue());
+      if (!isNaN(spots)) { caps.spotsLeft = spots; caps.rsvpFull = spots <= 0; }
+      if (!isNaN(bunks)) { caps.bunksLeft = bunks; caps.bunksFull = bunks <= 0; }
     }
   } catch (e) { Logger.log('getCaps_ ' + e); }
   return caps;
