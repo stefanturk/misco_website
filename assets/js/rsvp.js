@@ -2,6 +2,10 @@
    all talking to the Google Apps Script web app bound to the RSVP sheet.
    (No backend, no keys in the page.) */
 (function () {
+  // ===== Manual toggles — flip, commit, push (no Apps Script redeploy needed) =====
+  var RSVP_CLOSED  = false;  // true → no new RSVPs (gate still unlocks the guest list only)
+  var BUNKS_CLOSED = true;  // true → all bunks reserved; bunk option greyed out for everyone
+
   // ▼▼▼ Apps Script Web app URL (ends in /exec) ▼▼▼
   var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwxPCeQqORJQTRkaBd-ArjqR1cCbQefOtsXO_Ky2jDvrZ6LopVADY5_M9xzBVOKVvbA3A/exec';
   // ▲▲▲ until this is set, the teaser shows a placeholder and submit is disabled ▲▲▲
@@ -19,6 +23,33 @@
   var submitBtn = document.getElementById('submit-btn');
   var teaserCount = document.getElementById('teaser-count');
   var teaserList = document.getElementById('teaser-list');
+  var closedPanel = document.getElementById('rsvp-closed');
+  var bunkInput = form.querySelector('input[name="bunk"][value="Bunk bed"]');
+  var bunkLabel = bunkInput ? bunkInput.closest('label') : null;
+  var bunkMsg = document.getElementById('bunk-msg');
+
+  // Bunks are for both-night guests; they can also be closed off entirely once full.
+  function updateBunkState() {
+    var satChosen = (form.elements.arrival.value === 'Saturday morning');
+    var blocked = BUNKS_CLOSED || satChosen;
+    if (blocked && bunkInput.checked) bunkInput.checked = false;
+    bunkInput.disabled = blocked;
+    if (bunkLabel) bunkLabel.classList.toggle('disabled', blocked);
+    if (!bunkMsg) return;
+    if (BUNKS_CLOSED) {
+      bunkMsg.textContent = 'Bunks are full — please choose camping or off-premises.';
+      bunkMsg.classList.remove('hidden');
+    } else if (satChosen) {
+      bunkMsg.textContent = 'Bunks are prioritized for people staying both nights. Choose camping or off-premises, or switch your arrival to Friday.';
+      bunkMsg.classList.remove('hidden');
+    } else {
+      bunkMsg.classList.add('hidden');
+    }
+  }
+
+  Array.prototype.forEach.call(form.elements.arrival, function (r) {
+    r.addEventListener('change', updateBunkState);
+  });
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -75,10 +106,15 @@
   function unlock() {
     if (PASSWORDS.indexOf(pw.value.trim().toLowerCase()) !== -1) {
       gate.classList.add('hidden');
-      form.classList.remove('hidden');
       var who = document.getElementById('who-coming');
       if (who) who.classList.remove('hidden');
       loadGuests();
+      if (RSVP_CLOSED) {
+        if (closedPanel) closedPanel.classList.remove('hidden');
+      } else {
+        form.classList.remove('hidden');
+        updateBunkState();
+      }
     } else {
       gateStatus.textContent = 'Wrong password — try again.';
       pw.value = '';
@@ -95,6 +131,14 @@
     if (!APPS_SCRIPT_URL) {
       status.className = 'form-status error';
       status.textContent = 'RSVP isn’t live yet — the Google Sheet hookup is still being set up. Check back soon!';
+      return;
+    }
+
+    // Bunk radio may be disabled (Saturday-only or bunks full), which can drop the
+    // native required check — guard explicitly so they must pick a sleeping option.
+    if (!form.elements.bunk.value) {
+      status.className = 'form-status error';
+      status.textContent = 'Please choose where you’ll sleep.';
       return;
     }
 
