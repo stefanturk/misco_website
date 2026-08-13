@@ -120,7 +120,7 @@ var EMAIL_ORDER = ['welcome', 'oneMonth', 'oneWeek'];
 var DEFAULT_EMAILS = {
   welcome: {
     label: 'Welcome',
-    subject: "🪩 You're in — Camp Misco 4 (Sept 25–27)",
+    subject: "🪩 You're in — Camp Misco 4 (Sept 25–27) 🪩",
     body:
       "You're on the list, {firstName}! 🪩\n\n" +
       "Consider this your ticket. Here's the plan we've got down for you:\n\n" +
@@ -136,38 +136,38 @@ var DEFAULT_EMAILS = {
   },
   oneMonth: {
     label: 'One Month Out',
-    subject: '🪩 Camp Misco 4 is a month away',
+    subject: '🪩 Camp Misco is a month away 🪩',
     body:
-      "Camp Misco around the corner! Friday Sept 25th – Sunday Sept 27th\n\n" +
+      "Camp Misco around the corner!\n\n" +
       "- The address is 6836 Pappalardo Promenade, Murphys CA\n" +
-      "- Parking is very limited, so plan on carpooling with others!\n" +
+      "- You're arriving {arrival} — carpool with others because parking is very limited. Please don't drive alone!\n" +
       "- Bring some of your own food, drinks, and sleeping stuff. We will have some communal things but we also need to be self sustaining!\n\n" +
       "Your plan with us:\n\n" +
       "{recap}\n" +
       "{pay}\n" +
-      "{musician}\n" +
-      "See the lineup & schedule: {site}\n\n" +
-      "Here's the lay of the land — camping, stages, bathrooms, parking:\n\n" +
-      "{map}\n" +
-      "Questions? Don't reply here — text Alex at (650) 235-5059."
+      "{musician}\n\n" +
+      "Here's the lay of the land — camping, stages, bathrooms, parking:\n" +
+      "{map}\n\n" +
+      "See more: {site}\n" +
+      "Questions or cancellations? Don't reply here — text Alex at (650) 235-5059."
   },
   oneWeek: {
     label: 'One Week Out',
-    subject: '🪩 Camp Misco 4 is this week',
+    subject: '🪩 Camp Misco is this week 🪩',
     body:
       "Camp Misco is this week, {firstName}! 🪩\n\n" +
       "Travel safe, and here's what you need:\n" +
       "- The address is 6836 Pappalardo Promenade, Murphys CA\n" +
-      "- You're arriving {arrival} — carpool with others because parking is very limited. Please don't drive alone.\n" +
+      "- You're arriving {arrival} — carpool with others because parking is very limited. Please don't drive alone!\n" +
       "- Bring some of your own food, drinks, and sleeping stuff. We will have some communal things but we also need to be self sustaining!\n\n" +
-      "The weekend at a glance:\n\n" +
-      "{schedule}\n" +
-      "And where everything is:\n\n" +
-      "{map}\n" +
       "{pay}\n" +
-      "{musician}\n" +
-      "See the lineup & schedule: {site}\n\n" +
-      "Don't reply to this email — text Alex at (650) 235-5059 with any questions."
+      "{musician}\n\n" +
+      "The weekend at a glance:\n" +
+      "{schedule}\n\n" +
+      "And where everything is:\n" +
+      "{map}\n\n" +
+      "See the lineup & schedule: {site}\n" +
+      "Questions or cancellations? Don't reply here — text Alex at (650) 235-5059."
   }
 };
 
