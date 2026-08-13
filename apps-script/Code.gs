@@ -33,7 +33,8 @@
  *    can edit Subject/Body without touching code. Run  Misco Emails ▸ Set up / reset
  *    "Emails" tab  once to create it (seeds the defaults below).
  *  • In Subject/Body you can use tokens: {firstName} {arrival} {venmo} {site} and, in
- *    the Body only, {recap} (the guest's own RSVP details). Start a line with "- " for
+ *    the Body only (each on its own line): {recap} (the guest's own RSVP details),
+ *    {map} (the festival map image), {lineup} (the poster lineup). Start a line with "- " for
  *    a bullet; a blank line starts a new paragraph. Branding (header/footer) is added
  *    automatically. If the tab is missing/blank, the built-in defaults are used.
  *  • On RSVP: guest gets the "welcome" email. Founders are NOT emailed per-RSVP —
@@ -77,6 +78,17 @@ var BUNKS_LEFT_CELL = 'B3';   // bunks remaining → bunks close at 0 or below
 // LIVE copy in the spreadsheet's "Emails" tab — no need to touch this.
 // Tokens: {firstName} {arrival} {venmo} {site}; body-only block token: {recap}.
 // Line starting with "- " => bullet. Blank line => new paragraph.
+// Lineup for the {lineup} email block. Apps Script can't read the site's lineup.html,
+// so this mirrors it — update here (and redeploy) if the poster changes.
+var LINEUP = [
+  { acts: 'Litty deBungus · Pabsy (2 sets)' },
+  { acts: 'Trianna Feruza and the Heavy Hitters', headliner: true },
+  { acts: 'Wabsy · Dogwater · 2K House Band' },
+  { acts: 'Professor P · DJ Sally · Space Goat' },
+  { acts: 'Mezcal Lynn · DJ Wobert · The Real Experience' },
+  { acts: 'Hot Hawaiian String Band' }
+];
+
 var EMAIL_ORDER = ['welcome', 'gettingClose', 'dayOf'];
 var DEFAULT_EMAILS = {
   welcome: {
@@ -107,6 +119,8 @@ var DEFAULT_EMAILS = {
       "{recap}\n" +
       "Haven't squared up? Venmo {venmo} ($50).\n\n" +
       "Check the schedule: {site}schedule.html\n\n" +
+      "Here's the lay of the land — camping, stages, bathrooms, parking:\n\n" +
+      "{map}\n" +
       "Questions? Don't reply here — text Alex at (650) 235-5059."
   },
   dayOf: {
@@ -118,6 +132,10 @@ var DEFAULT_EMAILS = {
       "- Address & directions: (ADD THE VENUE ADDRESS HERE)\n" +
       "- You're arriving {arrival} — text when you're close.\n" +
       "- First film starts Friday night. Don't miss it.\n\n" +
+      "Who's playing:\n\n" +
+      "{lineup}\n" +
+      "And where everything is:\n\n" +
+      "{map}\n" +
       "If you haven't paid: Venmo {venmo} ($50).\n\n" +
       "Don't reply to this email — text Alex at (650) 235-5059 if you get lost."
   }
@@ -158,6 +176,40 @@ function recapHtml_(g) {
     '</table>';
 }
 
+/** {map} block: the festival map image, clickable through to the full map page. */
+function mapHtml_() {
+  var mapPage = SITE_URL + 'map.html';
+  var mapImg = SITE_URL + 'photos/map.jpeg';
+  return '' +
+    '<div style="margin:22px 0;text-align:center;">' +
+      '<a href="' + mapPage + '" style="text-decoration:none;">' +
+        '<img src="' + mapImg + '" alt="Camp Misco festival map" width="504" ' +
+          'style="display:block;width:100%;max-width:504px;margin:0 auto;border-radius:12px;border:1px solid #36204f;" />' +
+      '</a>' +
+      '<div style="margin-top:10px;font-size:13px;">' +
+        '<a href="' + mapPage + '" style="color:#ff84c4;font-weight:bold;">Open the full map →</a>' +
+      '</div>' +
+    '</div>';
+}
+
+/** {lineup} block: the poster lineup, linking through to the full lineup page. */
+function lineupHtml_() {
+  var lineupPage = SITE_URL + 'lineup.html';
+  var rows = LINEUP.map(function (r) {
+    var big = !!r.headliner;
+    return '<div style="padding:7px 0;font-size:' + (big ? '18px' : '15px') + ';' +
+      (big ? 'font-weight:800;color:#fff;' : 'color:#e9e1f7;') + '">' + esc_(r.acts) + '</div>';
+  }).join('');
+  return '' +
+    '<div style="margin:22px 0;padding:18px 20px;border:1px solid #36204f;border-radius:12px;background:#0e0a16;text-align:center;">' +
+      '<div style="font-size:12px;letter-spacing:3px;color:#ff84c4;font-weight:800;margin-bottom:10px;">THE LINEUP</div>' +
+      rows +
+      '<div style="margin-top:14px;font-size:13px;">' +
+        '<a href="' + lineupPage + '" style="color:#ff84c4;font-weight:bold;">See the full lineup →</a>' +
+      '</div>' +
+    '</div>';
+}
+
 /** Replace inline tokens inside one escaped line, then auto-link bare URLs. */
 function inlineTokens_(s, g) {
   var out = esc_(s)
@@ -191,6 +243,8 @@ function bodyToHtml_(text, g) {
   for (var i = 0; i < lines.length; i++) {
     var trimmed = lines[i].trim();
     if (trimmed === '{recap}') { flush(); html += recapHtml_(g); continue; }
+    if (trimmed === '{map}') { flush(); html += mapHtml_(); continue; }
+    if (trimmed === '{lineup}') { flush(); html += lineupHtml_(); continue; }
     if (trimmed === '') { flush(); continue; }
     if (/^[-•]\s+/.test(trimmed)) {
       bullets.push('<li style="margin:6px 0;">' + inlineTokens_(trimmed.replace(/^[-•]\s+/, ''), g) + '</li>');
@@ -501,7 +555,7 @@ function setupEmailsSheet() {
   sh.activate();
   ui.alert('Ready',
     'The "Emails" tab is set up. Edit any Subject/Body cell to change what goes out — ' +
-    'no code needed. Tokens: {firstName} {arrival} {venmo} {site} {recap}. ' +
+    'no code needed. Tokens: {firstName} {arrival} {venmo} {site} {recap} {map} {lineup}. ' +
     'Start a line with "- " for a bullet.',
     ui.ButtonSet.OK);
 }
@@ -525,7 +579,7 @@ function ensureEmailsSheet_(reset) {
     sh.setColumnWidth(3, 560);
     sh.getRange(2, 2, rows.length, 2).setWrap(true).setVerticalAlignment('top');
     sh.getRange(rows.length + 3, 1).setValue(
-      'Tokens: {firstName} {arrival} {venmo} {site}  ·  body-only: {recap} (their RSVP details)  ·  ' +
+      'Tokens: {firstName} {arrival} {venmo} {site}  ·  body-only (own line): {recap} {map} {lineup}  ·  ' +
       'start a line with "- " for a bullet  ·  blank line = new paragraph. ' +
       'The header/footer branding is added automatically.');
   }
