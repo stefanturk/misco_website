@@ -35,8 +35,8 @@
  *  • In Subject/Body you can use tokens: {firstName} {arrival} {venmo} {site} and, in
  *    the Body only (each on its own line): {recap} (the guest's own RSVP details),
  *    {map} (festival map image), {schedule} (weekend schedule), {address} (venue
- *    callout), {pay} (a Venmo nudge shown only if unpaid [col G] and not a musician
- *    [col H]). Start a line with "- " for
+ *    callout), {pay} (non-musicians: "paid" confirmation if col G set, else a Venmo
+ *    nudge), {musician} (load-in note shown only to musicians [col H]). Start a line with "- " for
  *    a bullet; a blank line starts a new paragraph. Branding (header/footer) is added
  *    automatically. If the tab is missing/blank, the built-in defaults are used.
  *  • On RSVP: guest gets the "welcome" email. Founders are NOT emailed per-RSVP —
@@ -125,6 +125,7 @@ var DEFAULT_EMAILS = {
       "Consider this your ticket. Here's the plan we've got down for you:\n\n" +
       "{recap}\n" +
       "{pay}\n" +
+      "{musician}\n" +
       "When: Friday Sept 25 – Sunday Sept 27, 2026\n" +
       "Where: Murphys, CA\n" +
       "The bit: Spice World / Double Feature — Friday Dune (1984), Saturday Spice World.\n\n" +
@@ -143,6 +144,7 @@ var DEFAULT_EMAILS = {
       "Your plan with us:\n\n" +
       "{recap}\n" +
       "{pay}\n" +
+      "{musician}\n" +
       "See the lineup & schedule: {site}\n\n" +
       "Here's the lay of the land — camping, stages, bathrooms, parking:\n\n" +
       "{map}\n" +
@@ -162,6 +164,7 @@ var DEFAULT_EMAILS = {
       "And where everything is:\n\n" +
       "{map}\n" +
       "{pay}\n" +
+      "{musician}\n" +
       "See the lineup & schedule: {site}\n\n" +
       "Don't reply to this email — text Alex at (650) 235-5059 with any questions."
   }
@@ -245,16 +248,33 @@ function scheduleHtml_() {
     '</div>';
 }
 
-/** {pay} block: a "please Venmo" nudge — shown ONLY if the guest hasn't paid (col G)
- *  and isn't a musician (col H). Renders nothing otherwise, so paid folks and players
- *  never see it. */
+/** {pay} block, for NON-musicians only (musicians get {musician} instead, no pay line):
+ *  paid (col G) → a "you're all set" confirmation; not paid → a "please Venmo" nudge. */
 function payHtml_(g) {
-  if (g && (g.paid || g.musician)) return '';
+  if (g && g.musician) return '';
+  if (g && g.paid) {
+    return '' +
+      '<div style="margin:0 0 16px;padding:14px 18px;border-left:3px solid #3ddc84;' +
+        'background:#082016;border-radius:0 6px 6px 0;font-size:15px;color:#e9e1f7;">' +
+        '✅ You\'re all set — your <strong style="color:#fff;">$50</strong> ticket is paid for. See you there!' +
+      '</div>';
+  }
   return '' +
     '<div style="margin:0 0 16px;padding:14px 18px;border-left:3px solid #ffd23d;' +
       'background:#231a08;border-radius:0 6px 6px 0;font-size:15px;color:#e9e1f7;">' +
       'Haven\'t squared up yet? The weekend is <strong style="color:#fff;">$50</strong> — ' +
       'Venmo <strong style="color:#ff84c4;">' + esc_(VENMO) + '</strong> to lock your spot.' +
+    '</div>';
+}
+
+/** {musician} block: load-in note — shown ONLY if the guest is a musician (col H). */
+function musicianHtml_(g) {
+  if (!(g && g.musician)) return '';
+  return '' +
+    '<div style="margin:0 0 16px;padding:14px 18px;border-left:3px solid #00e5ff;' +
+      'background:#08181e;border-radius:0 6px 6px 0;font-size:15px;color:#e9e1f7;">' +
+      '🎸 When you get there, load your equipment into the garage. ' +
+      'Drums, bass amp, and guitar amps will be backlined.' +
     '</div>';
 }
 
@@ -306,6 +326,7 @@ function bodyToHtml_(text, g) {
     if (trimmed === '{schedule}') { flush(); html += scheduleHtml_(); continue; }
     if (trimmed === '{address}') { flush(); html += addressHtml_(); continue; }
     if (trimmed === '{pay}') { flush(); html += payHtml_(g); continue; }
+    if (trimmed === '{musician}') { flush(); html += musicianHtml_(g); continue; }
     if (trimmed === '') { flush(); continue; }
     if (/^[-•]\s+/.test(trimmed)) {
       bullets.push('<li style="margin:6px 0;">' + inlineTokens_(trimmed.replace(/^[-•]\s+/, ''), g) + '</li>');
@@ -626,7 +647,7 @@ function setupEmailsSheet() {
   sh.activate();
   ui.alert('Ready',
     'The "Emails" tab is set up. Edit any Subject/Body cell to change what goes out — ' +
-    'no code needed. Tokens: {firstName} {arrival} {venmo} {site} {recap} {map} {schedule} {address} {pay}. ' +
+    'no code needed. Tokens: {firstName} {arrival} {venmo} {site} {recap} {map} {schedule} {address} {pay} {musician}. ' +
     'Start a line with "- " for a bullet.',
     ui.ButtonSet.OK);
 }
@@ -650,7 +671,7 @@ function ensureEmailsSheet_(reset) {
     sh.setColumnWidth(3, 560);
     sh.getRange(2, 2, rows.length, 2).setWrap(true).setVerticalAlignment('top');
     sh.getRange(rows.length + 3, 1).setValue(
-      'Tokens: {firstName} {arrival} {venmo} {site}  ·  body-only (own line): {recap} {map} {schedule} {address} {pay}  ·  ' +
+      'Tokens: {firstName} {arrival} {venmo} {site}  ·  body-only (own line): {recap} {map} {schedule} {address} {pay} {musician}  ·  ' +
       'start a line with "- " for a bullet  ·  blank line = new paragraph. ' +
       'The header/footer branding is added automatically.');
   }
