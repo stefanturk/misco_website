@@ -115,7 +115,7 @@ var SCHEDULE = [
   ] }
 ];
 
-var EMAIL_ORDER = ['welcome', 'gettingClose', 'dayOf'];
+var EMAIL_ORDER = ['welcome', 'oneMonth', 'oneWeek'];
 var DEFAULT_EMAILS = {
   welcome: {
     label: 'Welcome',
@@ -132,7 +132,7 @@ var DEFAULT_EMAILS = {
       "Need to cancel and get a refund later? No problem — just reach out to Alex and he'll handle it. Text (650) 235-5059.\n\n" +
       "Please don't reply to this email — it's not monitored. Anything you need, text Alex directly at (650) 235-5059. See you in the foothills."
   },
-  gettingClose: {
+  oneMonth: {
     label: 'One Month Out',
     subject: '🪩 Camp Misco 4 is a month away',
     body:
@@ -149,7 +149,7 @@ var DEFAULT_EMAILS = {
       "{map}\n" +
       "Questions? Don't reply here — text Alex at (650) 235-5059."
   },
-  dayOf: {
+  oneWeek: {
     label: 'One Week Out',
     subject: '🪩 Camp Misco 4 is next week',
     body:
@@ -602,12 +602,12 @@ function onOpen() {
     .addSeparator()
     .addSubMenu(ui.createMenu('Test to founders (preview)')
       .addItem('Welcome', 'sendWelcomeTest')
-      .addItem('One Month Out', 'sendGettingCloseTest')
-      .addItem('One Week Out', 'sendDayOfTest'))
+      .addItem('One Month Out', 'sendOneMonthTest')
+      .addItem('One Week Out', 'sendOneWeekTest'))
     .addSubMenu(ui.createMenu('Send to EVERYONE')
       .addItem('Welcome', 'sendWelcomeAll')
-      .addItem('One Month Out', 'sendGettingCloseAll')
-      .addItem('One Week Out', 'sendDayOfAll'))
+      .addItem('One Month Out', 'sendOneMonthAll')
+      .addItem('One Week Out', 'sendOneWeekAll'))
     .addToUi();
 }
 
@@ -659,8 +659,8 @@ function ensureEmailsSheet_(reset) {
 
 // ── Test previews (to founders) ────────────────────────────────────────────────
 function sendWelcomeTest() { sendTest_('welcome', 'Welcome'); }
-function sendGettingCloseTest() { sendTest_('gettingClose', 'One Month Out'); }
-function sendDayOfTest() { sendTest_('dayOf', 'One Week Out'); }
+function sendOneMonthTest() { sendTest_('oneMonth', 'One Month Out'); }
+function sendOneWeekTest() { sendTest_('oneWeek', 'One Week Out'); }
 
 function sendTest_(key, label) {
   var ui = SpreadsheetApp.getUi();
@@ -682,8 +682,8 @@ function sendTest_(key, label) {
 
 // ── Real batch sends (to all guests) ───────────────────────────────────────────
 function sendWelcomeAll() { sendBatch_('welcome', 'Welcome'); }
-function sendGettingCloseAll() { sendBatch_('gettingClose', 'One Month Out'); }
-function sendDayOfAll() { sendBatch_('dayOf', 'One Week Out'); }
+function sendOneMonthAll() { sendBatch_('oneMonth', 'One Month Out'); }
+function sendOneWeekAll() { sendBatch_('oneWeek', 'One Week Out'); }
 
 function sendBatch_(key, label) {
   var ui = SpreadsheetApp.getUi();
