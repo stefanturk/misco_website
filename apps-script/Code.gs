@@ -42,8 +42,10 @@
  *  • On RSVP: guest gets the "welcome" email. Founders are NOT emailed per-RSVP —
  *    instead they get a milestone recap every 10th RSVP (10, 20, 30, …) with the
  *    running count, the newest 10 names, and a link to the full sheet (toggles below).
- *  • Misco Emails menu ▸ Test to founders ▸ (Welcome / One Month Out / One Week Out) sends a
- *    preview to the founders so you can check the format before the real blast.
+ *  • Misco Emails menu ▸ Test to ME ▸ (…) sends one email to just whoever runs it,
+ *    using their real RSVP row (paid/musician reflect cols G/H) — the safe way to
+ *    preview your own copy. ▸ Test to founders ▸ (…) sends a generic-sample preview
+ *    to the founders before the real blast.
  *  • Misco Emails menu ▸ Send to EVERYONE ▸ (…) does the real de-duplicated batch send.
  * ─────────────────────────────────────────────────────────────────────────────
  */
@@ -621,6 +623,10 @@ function onOpen() {
   ui.createMenu('Misco Emails')
     .addItem('Set up / reset "Emails" tab', 'setupEmailsSheet')
     .addSeparator()
+    .addSubMenu(ui.createMenu('Test to ME (your real info)')
+      .addItem('Welcome', 'sendWelcomeToMe')
+      .addItem('One Month Out', 'sendOneMonthToMe')
+      .addItem('One Week Out', 'sendOneWeekToMe'))
     .addSubMenu(ui.createMenu('Test to founders (preview)')
       .addItem('Welcome', 'sendWelcomeTest')
       .addItem('One Month Out', 'sendOneMonthTest')
@@ -676,6 +682,46 @@ function ensureEmailsSheet_(reset) {
       'The header/footer branding is added automatically.');
   }
   return sh;
+}
+
+// ── Test to just yourself (uses your real RSVP row) ────────────────────────────
+function sendWelcomeToMe() { sendTestToMe_('welcome', 'Welcome'); }
+function sendOneMonthToMe() { sendTestToMe_('oneMonth', 'One Month Out'); }
+function sendOneWeekToMe() { sendTestToMe_('oneWeek', 'One Week Out'); }
+
+/** Send one email to whoever is running this (only them). Pulls your real RSVP row
+ *  from the sheet so paid (G) / musician (H) / bunk / arrival match reality; if you're
+ *  not in the sheet yet, falls back to a sample marked as a musician. */
+function sendTestToMe_(key, label) {
+  var ui = SpreadsheetApp.getUi();
+  if (!PropertiesService.getScriptProperties().getProperty('RESEND_API_KEY')) {
+    ui.alert('No RESEND_API_KEY set',
+      'Add it first: Project Settings ▸ Script Properties ▸ RESEND_API_KEY = your Resend key.',
+      ui.ButtonSet.OK);
+    return;
+  }
+  var me = String(Session.getActiveUser().getEmail() || '').trim();
+  if (!me) {
+    ui.alert('Couldn\'t detect your email',
+      'Google didn\'t hand back your address. Use "Test to founders" instead, or add yourself to the RSVP sheet.',
+      ui.ButtonSet.OK);
+    return;
+  }
+  var guest = null, all = getGuests_();
+  for (var i = 0; i < all.length; i++) {
+    if (all[i].email.trim().toLowerCase() === me.toLowerCase()) { guest = all[i]; break; }
+  }
+  var usingReal = !!guest;
+  if (!guest) guest = { name: me.split('@')[0], email: me, bunk: 'Bunk bed', venmo: '@your-venmo', arrival: 'Friday night', paid: false, musician: true };
+  var t = renderEmail_(key, guest);
+  var ok = sendEmail_(me, '[TEST] ' + t.subject, t.html);
+  ui.alert(ok ? 'Sent to you' : 'Send failed',
+    ok ? ('Sent the "' + label + '" email to ' + me + '.\n\n' +
+          (usingReal
+            ? 'Used your real RSVP row — the paid/musician block matches columns G/H for your row.'
+            : 'You\'re not in the RSVP sheet yet, so it used a sample marked as a musician (so you\'ll see the load-in note).'))
+       : 'Resend rejected it — check Extensions ▸ Apps Script ▸ Executions for the error.',
+    ui.ButtonSet.OK);
 }
 
 // ── Test previews (to founders) ────────────────────────────────────────────────
