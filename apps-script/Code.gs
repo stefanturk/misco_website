@@ -42,7 +42,7 @@
  *  • On RSVP: guest gets the "welcome" email. Founders are NOT emailed per-RSVP —
  *    instead they get a milestone recap every 10th RSVP (10, 20, 30, …) with the
  *    running count, the newest 10 names, and a link to the full sheet (toggles below).
- *  • Misco Emails menu ▸ Test to founders ▸ (Welcome / Getting Close / Day Of) sends a
+ *  • Misco Emails menu ▸ Test to founders ▸ (Welcome / One Month Out / One Week Out) sends a
  *    preview to the founders so you can check the format before the real blast.
  *  • Misco Emails menu ▸ Send to EVERYONE ▸ (…) does the real de-duplicated batch send.
  * ─────────────────────────────────────────────────────────────────────────────
@@ -133,11 +133,11 @@ var DEFAULT_EMAILS = {
       "Please don't reply to this email — it's not monitored. Anything you need, text Alex directly at (650) 235-5059. See you in the foothills."
   },
   gettingClose: {
-    label: 'Getting Close',
-    subject: '🪩 Camp Misco 4 is almost here',
+    label: 'One Month Out',
+    subject: '🪩 Camp Misco 4 is a month away',
     body:
-      "Almost showtime, {firstName}!\n\n" +
-      "Camp Misco is just around the corner. A few things to get you ready:\n" +
+      "One month out, {firstName}!\n\n" +
+      "Camp Misco is a month away. A few things to start thinking about:\n" +
       "- Pack layers — foothill nights get cold.\n" +
       "- Bring a swimsuit (Pool Stage), a flashlight, and a refillable bottle.\n" +
       "- Costumes encouraged for the double feature: Dune (1984) (Fri) & Spice World (Sat).\n\n" +
@@ -150,20 +150,20 @@ var DEFAULT_EMAILS = {
       "Questions? Don't reply here — text Alex at (650) 235-5059."
   },
   dayOf: {
-    label: 'Day Of',
-    subject: '🪩 Camp Misco 4 — today!',
+    label: 'One Week Out',
+    subject: '🪩 Camp Misco 4 is next week',
     body:
-      "It's today, {firstName}! 🪩\n\n" +
+      "Camp Misco is next week, {firstName}! 🪩\n\n" +
       "{address}\n" +
-      "Travel safe — here's what you need:\n" +
-      "- You're arriving {arrival} — text when you're close.\n" +
+      "Here's the plan:\n" +
+      "- You're arriving {arrival} — let Alex know if your plans change.\n" +
       "- First film starts Friday night. Don't miss it.\n\n" +
       "The weekend at a glance:\n\n" +
       "{schedule}\n" +
       "And where everything is:\n\n" +
       "{map}\n" +
       "{pay}\n" +
-      "Don't reply to this email — text Alex at (650) 235-5059 if you get lost."
+      "Don't reply to this email — text Alex at (650) 235-5059 with any questions."
   }
 };
 
@@ -602,12 +602,12 @@ function onOpen() {
     .addSeparator()
     .addSubMenu(ui.createMenu('Test to founders (preview)')
       .addItem('Welcome', 'sendWelcomeTest')
-      .addItem('Getting Close', 'sendGettingCloseTest')
-      .addItem('Day Of', 'sendDayOfTest'))
+      .addItem('One Month Out', 'sendGettingCloseTest')
+      .addItem('One Week Out', 'sendDayOfTest'))
     .addSubMenu(ui.createMenu('Send to EVERYONE')
       .addItem('Welcome', 'sendWelcomeAll')
-      .addItem('Getting Close', 'sendGettingCloseAll')
-      .addItem('Day Of', 'sendDayOfAll'))
+      .addItem('One Month Out', 'sendGettingCloseAll')
+      .addItem('One Week Out', 'sendDayOfAll'))
     .addToUi();
 }
 
@@ -659,8 +659,8 @@ function ensureEmailsSheet_(reset) {
 
 // ── Test previews (to founders) ────────────────────────────────────────────────
 function sendWelcomeTest() { sendTest_('welcome', 'Welcome'); }
-function sendGettingCloseTest() { sendTest_('gettingClose', 'Getting Close'); }
-function sendDayOfTest() { sendTest_('dayOf', 'Day Of'); }
+function sendGettingCloseTest() { sendTest_('gettingClose', 'One Month Out'); }
+function sendDayOfTest() { sendTest_('dayOf', 'One Week Out'); }
 
 function sendTest_(key, label) {
   var ui = SpreadsheetApp.getUi();
@@ -682,8 +682,8 @@ function sendTest_(key, label) {
 
 // ── Real batch sends (to all guests) ───────────────────────────────────────────
 function sendWelcomeAll() { sendBatch_('welcome', 'Welcome'); }
-function sendGettingCloseAll() { sendBatch_('gettingClose', 'Getting Close'); }
-function sendDayOfAll() { sendBatch_('dayOf', 'Day Of'); }
+function sendGettingCloseAll() { sendBatch_('gettingClose', 'One Month Out'); }
+function sendDayOfAll() { sendBatch_('dayOf', 'One Week Out'); }
 
 function sendBatch_(key, label) {
   var ui = SpreadsheetApp.getUi();
