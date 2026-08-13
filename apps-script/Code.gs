@@ -34,7 +34,8 @@
  *    "Emails" tab  once to create it (seeds the defaults below).
  *  • In Subject/Body you can use tokens: {firstName} {arrival} {venmo} {site} and, in
  *    the Body only (each on its own line): {recap} (the guest's own RSVP details),
- *    {map} (the festival map image), {lineup} (the poster lineup). Start a line with "- " for
+ *    {map} (festival map image), {schedule} (weekend schedule), {address} (venue
+ *    callout). Start a line with "- " for
  *    a bullet; a blank line starts a new paragraph. Branding (header/footer) is added
  *    automatically. If the tab is missing/blank, the built-in defaults are used.
  *  • On RSVP: guest gets the "welcome" email. Founders are NOT emailed per-RSVP —
@@ -60,6 +61,7 @@ var REPLY_TO = 'oodsigma28@gmail.com';                 // guest replies land her
 var FOUNDERS = ['oodsigma28@gmail.com', 'stefanturkowski@gmail.com']; // milestone recaps + test previews
 var SITE_URL = 'https://campmisco.com/';
 var VENMO = '@alex-youngberg';
+var VENUE_ADDRESS = '6836 Pappalardo Promenade, Murphys, CA';  // shown by the {address} block
 
 var SEND_WELCOME_ON_RSVP = true;          // email the guest a "ticket" the moment they RSVP
 var NOTIFY_FOUNDERS_ON_MILESTONE = true;  // email founders a recap every Nth RSVP (not every RSVP)
@@ -78,15 +80,38 @@ var BUNKS_LEFT_CELL = 'B3';   // bunks remaining → bunks close at 0 or below
 // LIVE copy in the spreadsheet's "Emails" tab — no need to touch this.
 // Tokens: {firstName} {arrival} {venmo} {site}; body-only block token: {recap}.
 // Line starting with "- " => bullet. Blank line => new paragraph.
-// Lineup for the {lineup} email block. Apps Script can't read the site's lineup.html,
-// so this mirrors it — update here (and redeploy) if the poster changes.
-var LINEUP = [
-  { acts: 'Litty deBungus · Pabsy (2 sets)' },
-  { acts: 'Trianna Feruza and the Heavy Hitters', headliner: true },
-  { acts: 'Wabsy · Dogwater · 2K House Band' },
-  { acts: 'Professor P · DJ Sally · Space Goat' },
-  { acts: 'Mezcal Lynn · DJ Wobert · The Real Experience' },
-  { acts: 'Hot Hawaiian String Band' }
+// Schedule for the {schedule} email block. Apps Script can't read the site's
+// schedule.html, so this mirrors it — update here (and redeploy) if the schedule
+// changes. Each slot is [time, act, 'Inside'|'Outside', isHeadliner?].
+var SCHEDULE = [
+  { day: 'Friday Night', sub: 'Welcome, Make Camp, Get Weird', slots: [
+    ['8:00', 'Jam (Strawberry)', 'Outside'],
+    ['9:00', 'The Real Experience', 'Outside'],
+    ['10:00', 'Pabsy', 'Outside', true],
+    ['11:30', 'DJ Nobody', 'Inside'],
+    ['Midnight', 'Wabsy', 'Inside'],
+    ['1:00', 'DJ Wobert', 'Inside'],
+    ['2:00', 'Jam (Blackberry)', 'Inside']
+  ] },
+  { day: 'Saturday Day', sub: 'Swimming, Talent Show, Good Vibes', slots: [
+    ['Noon', 'Jam (Peach)', 'Outside'],
+    ['1:00', 'Hot Hawaiian String Band', 'Outside'],
+    ['2:00', 'Talent Show', 'Outside'],
+    ['3:00', '2K House Band', 'Outside'],
+    ['4:00', 'Space Goat', 'Outside'],
+    ['5:00', 'Pabsy', 'Outside', true],
+    ['6:30', 'DJ Sally', 'Inside']
+  ] },
+  { day: 'Saturday Night', sub: 'Lights, Camera, Action', slots: [
+    ['7:00', 'Dogwater', 'Outside'],
+    ['8:00', 'DJ Sally', 'Inside'],
+    ['8:30', 'Trianna Feruza and the Heavy Hitters', 'Outside', true],
+    ['10:00', 'Flunkyball Finals', 'Outside'],
+    ['10:30', 'Litty deBungus', 'Outside', true],
+    ['Midnight', 'Mezcal Lynn', 'Inside'],
+    ['12:30', 'Professor P', 'Inside'],
+    ['1:30', 'Jam Jam (a la mode)', 'Inside']
+  ] }
 ];
 
 var EMAIL_ORDER = ['welcome', 'gettingClose', 'dayOf'];
@@ -128,12 +153,12 @@ var DEFAULT_EMAILS = {
     subject: '🪩 Camp Misco 4 — today!',
     body:
       "It's today, {firstName}! 🪩\n\n" +
+      "{address}\n" +
       "Travel safe — here's what you need:\n" +
-      "- Address & directions: (ADD THE VENUE ADDRESS HERE)\n" +
       "- You're arriving {arrival} — text when you're close.\n" +
       "- First film starts Friday night. Don't miss it.\n\n" +
-      "Who's playing:\n\n" +
-      "{lineup}\n" +
+      "The weekend at a glance:\n\n" +
+      "{schedule}\n" +
       "And where everything is:\n\n" +
       "{map}\n" +
       "If you haven't paid: Venmo {venmo} ($50).\n\n" +
@@ -167,12 +192,10 @@ function wrapEmail_(innerHtml) {
 function recapHtml_(g) {
   var bunk = esc_(g.bunk || '—');
   var arr = esc_(g.arrival || '—');
-  var venmo = esc_(g.venmo || '—');
   return '' +
     '<table style="width:100%;border-collapse:collapse;margin:18px 0;font-size:14px;">' +
       '<tr><td style="padding:6px 0;color:#9b86bf;width:130px;">Sleeping</td><td style="padding:6px 0;">' + bunk + '</td></tr>' +
       '<tr><td style="padding:6px 0;color:#9b86bf;">Arriving</td><td style="padding:6px 0;">' + arr + '</td></tr>' +
-      '<tr><td style="padding:6px 0;color:#9b86bf;">Venmo</td><td style="padding:6px 0;">' + venmo + '</td></tr>' +
     '</table>';
 }
 
@@ -192,21 +215,43 @@ function mapHtml_() {
     '</div>';
 }
 
-/** {lineup} block: the poster lineup, linking through to the full lineup page. */
-function lineupHtml_() {
-  var lineupPage = SITE_URL + 'lineup.html';
-  var rows = LINEUP.map(function (r) {
-    var big = !!r.headliner;
-    return '<div style="padding:7px 0;font-size:' + (big ? '18px' : '15px') + ';' +
-      (big ? 'font-weight:800;color:#fff;' : 'color:#e9e1f7;') + '">' + esc_(r.acts) + '</div>';
+/** {schedule} block: the weekend schedule by day, linking to the full schedule page. */
+function scheduleHtml_() {
+  var page = SITE_URL + 'schedule.html';
+  var days = SCHEDULE.map(function (d) {
+    var rows = d.slots.map(function (s) {
+      var time = s[0], act = s[1], where = s[2], big = !!s[3];
+      var whereColor = /inside/i.test(where) ? '#8b5cf6' : '#ff84c4';
+      return '<tr>' +
+        '<td style="padding:5px 10px 5px 0;color:#9b86bf;font-family:monospace;font-size:12px;white-space:nowrap;vertical-align:top;width:64px;">' + esc_(time) + '</td>' +
+        '<td style="padding:5px 0;font-size:14px;' + (big ? 'font-weight:800;color:#fff;' : 'color:#e9e1f7;') + '">' +
+          esc_(act) + ' <span style="color:' + whereColor + ';font-size:10px;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;">· ' + esc_(where) + '</span>' +
+        '</td></tr>';
+    }).join('');
+    return '<div style="margin:0 0 16px;">' +
+      '<div style="font-size:13px;font-weight:800;color:#fff;">' + esc_(d.day) + '</div>' +
+      '<div style="font-size:11px;color:#9b86bf;letter-spacing:1px;text-transform:uppercase;margin:0 0 6px;">' + esc_(d.sub) + '</div>' +
+      '<table style="width:100%;border-collapse:collapse;">' + rows + '</table>' +
+    '</div>';
   }).join('');
   return '' +
-    '<div style="margin:22px 0;padding:18px 20px;border:1px solid #36204f;border-radius:12px;background:#0e0a16;text-align:center;">' +
-      '<div style="font-size:12px;letter-spacing:3px;color:#ff84c4;font-weight:800;margin-bottom:10px;">THE LINEUP</div>' +
-      rows +
-      '<div style="margin-top:14px;font-size:13px;">' +
-        '<a href="' + lineupPage + '" style="color:#ff84c4;font-weight:bold;">See the full lineup →</a>' +
+    '<div style="margin:22px 0;padding:18px 20px;border:1px solid #36204f;border-radius:12px;background:#0e0a16;">' +
+      '<div style="font-size:12px;letter-spacing:3px;color:#ff84c4;font-weight:800;margin-bottom:12px;text-align:center;">THE SCHEDULE</div>' +
+      days +
+      '<div style="margin-top:6px;font-size:13px;text-align:center;">' +
+        '<a href="' + page + '" style="color:#ff84c4;font-weight:bold;">See the full schedule →</a>' +
       '</div>' +
+    '</div>';
+}
+
+/** {address} block: a prominent venue callout with a Google Maps link. */
+function addressHtml_() {
+  var maps = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(VENUE_ADDRESS);
+  return '' +
+    '<div style="margin:0 0 22px;padding:18px 20px;border:2px solid #ff3da6;border-radius:12px;background:#1e0f22;text-align:center;">' +
+      '<div style="font-size:11px;letter-spacing:3px;color:#ff84c4;font-weight:800;">📍 WHERE</div>' +
+      '<div style="font-size:19px;font-weight:800;color:#fff;margin:6px 0 10px;">' + esc_(VENUE_ADDRESS) + '</div>' +
+      '<a href="' + maps + '" style="color:#ff84c4;font-weight:bold;font-size:14px;">Open in Google Maps →</a>' +
     '</div>';
 }
 
@@ -244,7 +289,8 @@ function bodyToHtml_(text, g) {
     var trimmed = lines[i].trim();
     if (trimmed === '{recap}') { flush(); html += recapHtml_(g); continue; }
     if (trimmed === '{map}') { flush(); html += mapHtml_(); continue; }
-    if (trimmed === '{lineup}') { flush(); html += lineupHtml_(); continue; }
+    if (trimmed === '{schedule}') { flush(); html += scheduleHtml_(); continue; }
+    if (trimmed === '{address}') { flush(); html += addressHtml_(); continue; }
     if (trimmed === '') { flush(); continue; }
     if (/^[-•]\s+/.test(trimmed)) {
       bullets.push('<li style="margin:6px 0;">' + inlineTokens_(trimmed.replace(/^[-•]\s+/, ''), g) + '</li>');
@@ -555,7 +601,7 @@ function setupEmailsSheet() {
   sh.activate();
   ui.alert('Ready',
     'The "Emails" tab is set up. Edit any Subject/Body cell to change what goes out — ' +
-    'no code needed. Tokens: {firstName} {arrival} {venmo} {site} {recap} {map} {lineup}. ' +
+    'no code needed. Tokens: {firstName} {arrival} {venmo} {site} {recap} {map} {schedule} {address}. ' +
     'Start a line with "- " for a bullet.',
     ui.ButtonSet.OK);
 }
@@ -579,7 +625,7 @@ function ensureEmailsSheet_(reset) {
     sh.setColumnWidth(3, 560);
     sh.getRange(2, 2, rows.length, 2).setWrap(true).setVerticalAlignment('top');
     sh.getRange(rows.length + 3, 1).setValue(
-      'Tokens: {firstName} {arrival} {venmo} {site}  ·  body-only (own line): {recap} {map} {lineup}  ·  ' +
+      'Tokens: {firstName} {arrival} {venmo} {site}  ·  body-only (own line): {recap} {map} {schedule} {address}  ·  ' +
       'start a line with "- " for a bullet  ·  blank line = new paragraph. ' +
       'The header/footer branding is added automatically.');
   }
