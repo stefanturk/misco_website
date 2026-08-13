@@ -64,6 +64,16 @@ var SEND_WELCOME_ON_RSVP = true;          // email the guest a "ticket" the mome
 var NOTIFY_FOUNDERS_ON_MILESTONE = true;  // email founders a recap every Nth RSVP (not every RSVP)
 var MILESTONE_EVERY = 10;                 // 10, 20, 30, … RSVPs triggers a founder recap
 
+// ── Live caps (read from the "Budget" tab; auto-close when hit) ─────────────────
+// The Budget tab already tallies these, so we read them straight from the bound
+// sheet — no credentials, no service account. Auto-close works ALONGSIDE the
+// website's manual BUNKS_CLOSED / RSVP_CLOSED switches (either one can close).
+var BUDGET_SHEET = 'Budget';
+var BUNK_COUNT_CELL = 'B21';   // live # of guests in bunks
+var TOTAL_COUNT_CELL = 'B17';  // live total # of people
+var BUNK_CAP = 14;             // bunks are full once the count reaches this
+var TOTAL_CAP = 70;            // RSVP closes once the total reaches this
+
 // ── DEFAULT EMAIL COPY ─────────────────────────────────────────────────────────
 // Seeds the "Emails" tab and is the fallback if that tab is missing/blank. Edit the
 // LIVE copy in the spreadsheet's "Emails" tab — no need to touch this.
@@ -350,6 +360,22 @@ function getGuests_() {
   return guests;
 }
 
+/** Live counts + fullness flags from the "Budget" tab. Best-effort: if the tab or
+ *  cells can't be read, nothing is treated as full (fail OPEN, never block on error). */
+function getCaps_() {
+  var caps = { bunks: null, total: null, bunksFull: false, rsvpFull: false };
+  try {
+    var b = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(BUDGET_SHEET);
+    if (b) {
+      var bunks = Number(b.getRange(BUNK_COUNT_CELL).getValue());
+      var total = Number(b.getRange(TOTAL_COUNT_CELL).getValue());
+      if (!isNaN(bunks)) { caps.bunks = bunks; caps.bunksFull = bunks >= BUNK_CAP; }
+      if (!isNaN(total)) { caps.total = total; caps.rsvpFull = total >= TOTAL_CAP; }
+    }
+  } catch (e) { Logger.log('getCaps_ ' + e); }
+  return caps;
+}
+
 function json_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
@@ -377,6 +403,11 @@ function doPost(e) {
       venmo: String(data.venmo || ''),
       arrival: String(data.arrival || '')
     };
+
+    // Live capacity gate (Budget tab). Server-side so it can't be bypassed by the UI.
+    var caps = getCaps_();
+    if (caps.rsvpFull) return json_({ ok: false, error: 'rsvp_closed' });
+    if (caps.bunksFull && /bunk/i.test(guest.bunk)) return json_({ ok: false, error: 'bunks_full' });
 
     // Block a second RSVP from an email that's already in the sheet (case-insensitive).
     var email = guest.email.toLowerCase();
@@ -435,7 +466,8 @@ function doGet() {
     return { name: g.name, arrival: g.arrival };
   });
   guests.reverse();
-  return json_({ count: guests.length, guests: guests });
+  var caps = getCaps_();
+  return json_({ count: guests.length, guests: guests, bunksFull: caps.bunksFull, rsvpFull: caps.rsvpFull });
 }
 
 // ── Spreadsheet menu (no code/terminal needed) ─────────────────────────────────

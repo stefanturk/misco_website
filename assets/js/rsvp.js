@@ -6,6 +6,13 @@
   var RSVP_CLOSED  = false;  // true → no new RSVPs (gate still unlocks the guest list only)
   var BUNKS_CLOSED = false;  // true → all bunks reserved; bunk option greyed out for everyone
 
+  // Live capacity from the Budget tab (getCaps_ in Code.gs → doGet). These OR with the
+  // manual switches above — either the switch or the live count can close things.
+  var serverBunksFull = false;
+  var serverRsvpFull = false;
+  function bunksBlocked() { return BUNKS_CLOSED || serverBunksFull; }
+  function rsvpClosed() { return RSVP_CLOSED || serverRsvpFull; }
+
   // ▼▼▼ Apps Script Web app URL (ends in /exec) ▼▼▼
   var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwxPCeQqORJQTRkaBd-ArjqR1cCbQefOtsXO_Ky2jDvrZ6LopVADY5_M9xzBVOKVvbA3A/exec';
   // ▲▲▲ until this is set, the teaser shows a placeholder and submit is disabled ▲▲▲
@@ -40,12 +47,12 @@
   // Bunks are for both-night guests; they can also be closed off entirely once full.
   function updateBunkState() {
     var satChosen = (form.elements.arrival.value === 'Saturday morning');
-    var blocked = BUNKS_CLOSED || satChosen;
+    var blocked = bunksBlocked() || satChosen;
     if (blocked && bunkInput.checked) { bunkInput.checked = false; flashBunk(); }
     bunkInput.disabled = blocked;
     if (bunkLabel) bunkLabel.classList.toggle('disabled', blocked);
     if (!bunkMsg) return;
-    if (BUNKS_CLOSED) {
+    if (bunksBlocked()) {
       bunkMsg.textContent = 'Bunks are full — please choose camping or off-premises.';
       bunkMsg.classList.remove('hidden');
     } else if (satChosen) {
@@ -100,12 +107,21 @@
     if (teaserList) teaserList.innerHTML = '<li class="teaser-empty">Loading…</li>';
   }
 
+  // Fold the server's live caps into the UI: closed panel + greyed bunks.
+  function applyState(data) {
+    serverBunksFull = !!(data && data.bunksFull);
+    serverRsvpFull = !!(data && data.rsvpFull);
+    if (closedPanel) closedPanel.classList.toggle('hidden', !rsvpClosed());
+    if (rsvpClosed() && form) form.classList.add('hidden');
+    updateBunkState();
+  }
+
   function loadGuests() {
     if (!APPS_SCRIPT_URL) return;
     showLoading();
     fetch(APPS_SCRIPT_URL)
       .then(function (r) { return r.json(); })
-      .then(renderTeaser)
+      .then(function (data) { renderTeaser(data); applyState(data); })
       .catch(function () {
         if (teaserCount) teaserCount.textContent = '';
         if (teaserList) teaserList.innerHTML = '<li class="teaser-empty">Couldn’t load the list — refresh to try again.</li>';
@@ -118,7 +134,7 @@
       var who = document.getElementById('who-coming');
       if (who) who.classList.remove('hidden');
       loadGuests();
-      if (RSVP_CLOSED) {
+      if (rsvpClosed()) {
         if (closedPanel) closedPanel.classList.remove('hidden');
       } else {
         form.classList.remove('hidden');
@@ -135,8 +151,12 @@
   pw.addEventListener('keydown', function (e) { if (e.key === 'Enter') unlock(); });
 
   // When closed, the notice shows immediately (before the password); the gate still
-  // works and reveals only the guest list.
-  if (RSVP_CLOSED && closedPanel) closedPanel.classList.remove('hidden');
+  // works and reveals only the guest list. Reflect the manual switch right away, then
+  // fetch the live caps so a sheet-driven close shows up without a password.
+  if (closedPanel) closedPanel.classList.toggle('hidden', !rsvpClosed());
+  if (APPS_SCRIPT_URL) {
+    fetch(APPS_SCRIPT_URL).then(function (r) { return r.json(); }).then(applyState).catch(function () {});
+  }
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -184,6 +204,17 @@
         } else if (res && res.error === 'duplicate') {
           status.className = 'form-status error';
           status.textContent = 'That email has already submitted an RSVP. Want to make changes? Contact Alex — text (650) 235-5059.';
+          submitBtn.disabled = false;
+        } else if (res && res.error === 'rsvp_closed') {
+          serverRsvpFull = true;
+          form.classList.add('hidden');
+          if (closedPanel) closedPanel.classList.remove('hidden');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else if (res && res.error === 'bunks_full') {
+          serverBunksFull = true;
+          updateBunkState();
+          status.className = 'form-status error';
+          status.textContent = 'Bunks just filled up — please choose camping or off-premises, then resend.';
           submitBtn.disabled = false;
         } else {
           throw new Error((res && res.error) || 'unknown error');
