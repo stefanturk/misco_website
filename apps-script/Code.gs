@@ -136,33 +136,33 @@ var DEFAULT_EMAILS = {
     label: 'One Month Out',
     subject: '🪩 Camp Misco 4 is a month away',
     body:
-      "One month out, {firstName}!\n\n" +
-      "Camp Misco is a month away. A few things to start thinking about:\n" +
-      "- Pack layers — foothill nights get cold.\n" +
-      "- Bring a swimsuit (Pool Stage), a flashlight, and a refillable bottle.\n" +
-      "- Costumes encouraged for the double feature: Dune (1984) (Fri) & Spice World (Sat).\n\n" +
+      "Camp Misco around the corner! Friday Sept 25th – Sunday Sept 27th\n\n" +
+      "- The address is 6836 Pappalardo Promenade, Murphys CA\n" +
+      "- Parking is very limited, so plan on carpooling with others!\n" +
+      "- Bring some of your own food, drinks, and sleeping stuff. We will have some communal things but we also need to be self sustaining!\n\n" +
       "Your plan with us:\n\n" +
       "{recap}\n" +
       "{pay}\n" +
-      "Check the schedule: {site}schedule.html\n\n" +
+      "See the lineup & schedule: {site}\n\n" +
       "Here's the lay of the land — camping, stages, bathrooms, parking:\n\n" +
       "{map}\n" +
       "Questions? Don't reply here — text Alex at (650) 235-5059."
   },
   oneWeek: {
     label: 'One Week Out',
-    subject: '🪩 Camp Misco 4 is next week',
+    subject: '🪩 Camp Misco 4 is this week',
     body:
-      "Camp Misco is next week, {firstName}! 🪩\n\n" +
-      "{address}\n" +
-      "Here's the plan:\n" +
-      "- You're arriving {arrival} — let Alex know if your plans change.\n" +
-      "- First film starts Friday night. Don't miss it.\n\n" +
+      "Camp Misco is this week, {firstName}! 🪩\n\n" +
+      "Travel safe, and here's what you need:\n" +
+      "- The address is 6836 Pappalardo Promenade, Murphys CA\n" +
+      "- You're arriving {arrival} — carpool with others because parking is very limited. Please don't drive alone.\n" +
+      "- Bring some of your own food, drinks, and sleeping stuff. We will have some communal things but we also need to be self sustaining!\n\n" +
       "The weekend at a glance:\n\n" +
       "{schedule}\n" +
       "And where everything is:\n\n" +
       "{map}\n" +
       "{pay}\n" +
+      "See the lineup & schedule: {site}\n\n" +
       "Don't reply to this email — text Alex at (650) 235-5059 with any questions."
   }
 };
