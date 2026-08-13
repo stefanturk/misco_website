@@ -44,8 +44,7 @@
  *    running count, the newest 10 names, and a link to the full sheet (toggles below).
  *  • Misco Emails menu ▸ Test to ME ▸ (…) sends one email to just whoever runs it,
  *    using their real RSVP row (paid/musician reflect cols G/H) — the safe way to
- *    preview your own copy. ▸ Test to founders ▸ (…) sends a generic-sample preview
- *    to the founders before the real blast.
+ *    preview your own copy before the real blast.
  *  • Misco Emails menu ▸ Send to EVERYONE ▸ (…) does the real de-duplicated batch send.
  * ─────────────────────────────────────────────────────────────────────────────
  */
@@ -61,7 +60,7 @@ var FROM = 'Camp Misco <misco@littyd.com>';            // must be a Resend-verif
 // paid plan — Resend charges ~$20/mo for a 2nd domain/address), then swap the line above
 // for:  var FROM = 'Camp Misco <tickets@campmisco.com>';
 var REPLY_TO = 'oodsigma28@gmail.com';                 // guest replies land here
-var FOUNDERS = ['oodsigma28@gmail.com', 'stefanturkowski@gmail.com']; // milestone recaps + test previews
+var FOUNDERS = ['oodsigma28@gmail.com', 'stefanturkowski@gmail.com']; // milestone recaps
 var SITE_URL = 'https://campmisco.com/';
 var VENMO = '@alex-youngberg';
 var VENUE_ADDRESS = '6836 Pappalardo Promenade, Murphys, CA';  // shown by the {address} block
@@ -627,10 +626,6 @@ function onOpen() {
       .addItem('Welcome', 'sendWelcomeToMe')
       .addItem('One Month Out', 'sendOneMonthToMe')
       .addItem('One Week Out', 'sendOneWeekToMe'))
-    .addSubMenu(ui.createMenu('Test to founders (preview)')
-      .addItem('Welcome', 'sendWelcomeTest')
-      .addItem('One Month Out', 'sendOneMonthTest')
-      .addItem('One Week Out', 'sendOneWeekTest'))
     .addSubMenu(ui.createMenu('Send to EVERYONE')
       .addItem('Welcome', 'sendWelcomeAll')
       .addItem('One Month Out', 'sendOneMonthAll')
@@ -703,7 +698,7 @@ function sendTestToMe_(key, label) {
   var me = String(Session.getActiveUser().getEmail() || '').trim();
   if (!me) {
     ui.alert('Couldn\'t detect your email',
-      'Google didn\'t hand back your address. Use "Test to founders" instead, or add yourself to the RSVP sheet.',
+      'Google didn\'t hand back your address. Make sure you\'re signed in as yourself, or add your row to the RSVP sheet.',
       ui.ButtonSet.OK);
     return;
   }
@@ -720,29 +715,6 @@ function sendTestToMe_(key, label) {
           (usingReal
             ? 'Used your real RSVP row — the paid/musician block matches columns G/H for your row.'
             : 'You\'re not in the RSVP sheet yet, so it used a sample marked as a musician (so you\'ll see the load-in note).'))
-       : 'Resend rejected it — check Extensions ▸ Apps Script ▸ Executions for the error.',
-    ui.ButtonSet.OK);
-}
-
-// ── Test previews (to founders) ────────────────────────────────────────────────
-function sendWelcomeTest() { sendTest_('welcome', 'Welcome'); }
-function sendOneMonthTest() { sendTest_('oneMonth', 'One Month Out'); }
-function sendOneWeekTest() { sendTest_('oneWeek', 'One Week Out'); }
-
-function sendTest_(key, label) {
-  var ui = SpreadsheetApp.getUi();
-  if (!PropertiesService.getScriptProperties().getProperty('RESEND_API_KEY')) {
-    ui.alert('No RESEND_API_KEY set',
-      'Add it first: Project Settings ▸ Script Properties ▸ RESEND_API_KEY = your Resend key.',
-      ui.ButtonSet.OK);
-    return;
-  }
-  // A sample guest so {recap}/{firstName}/{arrival} render like a real send.
-  var sample = { name: 'Stefan', email: '', bunk: 'Bunk bed', venmo: '@your-venmo', arrival: 'Friday night' };
-  var t = renderEmail_(key, sample);
-  var ok = sendEmail_(FOUNDERS, '[TEST] ' + t.subject, t.html);
-  ui.alert(ok ? 'Test sent' : 'Test failed',
-    ok ? 'Sent the "' + label + '" preview to the founders:\n' + FOUNDERS.join(', ')
        : 'Resend rejected it — check Extensions ▸ Apps Script ▸ Executions for the error.',
     ui.ButtonSet.OK);
 }
