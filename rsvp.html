@@ -39,6 +39,12 @@
     <p class="section-eyebrow center">Camp Misco 4 · Sept 25–27 · Murphys, CA</p>
     <h1 class="section-title glow center" style="margin-bottom:2rem">RSVP</h1>
 
+    <!-- RSVP closed (shown on load when RSVP_CLOSED, before the password) -->
+    <div class="gate hidden" id="rsvp-closed">
+      <h2 class="section-eyebrow center" style="margin-top:0">RSVP is closed</h2>
+      <p class="lead center">We’re full for Camp Misco 4 — thanks for the love! Questions or need a change? Text Alex at <strong>(650) 235-5059</strong>.</p>
+    </div>
+
     <!-- Who's coming (shown once unlocked; stays put through submit) -->
     <div class="hidden" id="who-coming">
       <h2 class="section-eyebrow center" style="margin-top:0">Who's coming</h2>
@@ -84,7 +90,7 @@
 
       <div class="field">
         <label>Where would you like to sleep?</label>
-        <p class="field-hint">Only ~20 bunk spots available across 3 shared rooms (4–8 bunks each). Grab one early or plan to camp.</p>
+        <p class="field-hint">Only 14 bunk spots available across 2 shared rooms. Only for people staying both nights.</p>
         <div class="choice">
           <label><input type="radio" name="bunk" value="Bunk bed" required /><span>Bunk bed</span></label>
           <label><input type="radio" name="bunk" value="Camping" /><span>Camping</span></label>
@@ -108,12 +114,6 @@
       <p class="form-status" id="form-status"></p>
       <div class="notice">Need to cancel or change your submission? No problem — just reach out to Alex and he’ll handle it. Text <strong>(650) 235-5059</strong>.</div>
     </form>
-
-    <!-- RSVP closed (shown after unlock when RSVP_CLOSED) -->
-    <div class="gate hidden" id="rsvp-closed">
-      <h2 class="section-eyebrow center" style="margin-top:0">RSVP is closed</h2>
-      <p class="lead center">We’re full for Camp Misco 4 — thanks for the love! Questions or need a change? Text Alex at <strong>(650) 235-5059</strong>.</p>
-    </div>
 
     <!-- Thank-you (hidden until submitted) -->
     <div class="thanks hidden" id="thanks">

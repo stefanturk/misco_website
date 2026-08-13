@@ -3,8 +3,8 @@
    (No backend, no keys in the page.) */
 (function () {
   // ===== Manual toggles — flip, commit, push (no Apps Script redeploy needed) =====
-  var RSVP_CLOSED  = true;  // true → no new RSVPs (gate still unlocks the guest list only)
-  var BUNKS_CLOSED = true;  // true → all bunks reserved; bunk option greyed out for everyone
+  var RSVP_CLOSED  = false;  // true → no new RSVPs (gate still unlocks the guest list only)
+  var BUNKS_CLOSED = false;  // true → all bunks reserved; bunk option greyed out for everyone
 
   // ▼▼▼ Apps Script Web app URL (ends in /exec) ▼▼▼
   var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwxPCeQqORJQTRkaBd-ArjqR1cCbQefOtsXO_Ky2jDvrZ6LopVADY5_M9xzBVOKVvbA3A/exec';
@@ -28,11 +28,20 @@
   var bunkLabel = bunkInput ? bunkInput.closest('label') : null;
   var bunkMsg = document.getElementById('bunk-msg');
 
+  // Flash the bunk option red once, then let it settle to greyed-out.
+  function flashBunk() {
+    if (!bunkLabel) return;
+    bunkLabel.classList.remove('flash-red');
+    void bunkLabel.offsetWidth; // reflow so the animation restarts each time
+    bunkLabel.classList.add('flash-red');
+    setTimeout(function () { bunkLabel.classList.remove('flash-red'); }, 650);
+  }
+
   // Bunks are for both-night guests; they can also be closed off entirely once full.
   function updateBunkState() {
     var satChosen = (form.elements.arrival.value === 'Saturday morning');
     var blocked = BUNKS_CLOSED || satChosen;
-    if (blocked && bunkInput.checked) bunkInput.checked = false;
+    if (blocked && bunkInput.checked) { bunkInput.checked = false; flashBunk(); }
     bunkInput.disabled = blocked;
     if (bunkLabel) bunkLabel.classList.toggle('disabled', blocked);
     if (!bunkMsg) return;
@@ -124,6 +133,10 @@
 
   gateBtn.addEventListener('click', unlock);
   pw.addEventListener('keydown', function (e) { if (e.key === 'Enter') unlock(); });
+
+  // When closed, the notice shows immediately (before the password); the gate still
+  // works and reveals only the guest list.
+  if (RSVP_CLOSED && closedPanel) closedPanel.classList.remove('hidden');
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();

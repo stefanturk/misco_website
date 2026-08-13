@@ -576,6 +576,11 @@ body::after {
 .choice label:has(input:checked) { border-color: var(--accent-1); background: color-mix(in srgb, var(--accent-1) 20%, transparent); box-shadow: 0 0 18px color-mix(in srgb, var(--accent-1) 35%, transparent); }
 .choice label.disabled { opacity: 0.45; cursor: not-allowed; filter: grayscale(0.8); }
 .choice label.disabled span { color: var(--muted); }
+.choice label.flash-red { opacity: 1 !important; filter: none !important; animation: bunk-flash-red 0.6s ease-out; }
+@keyframes bunk-flash-red {
+  0%   { border-color: #ff3b3b; background: color-mix(in srgb, #ff3b3b 30%, transparent); box-shadow: 0 0 18px color-mix(in srgb, #ff3b3b 45%, transparent); }
+  100% { border-color: var(--line); background: transparent; box-shadow: none; }
+}
 .notice {
   border-left: 3px solid var(--accent-3); padding: 0.9rem 1.1rem; margin-bottom: 1.6rem;
   background: color-mix(in srgb, var(--accent-3) 8%, transparent); border-radius: 0 4px 4px 0;
