@@ -100,7 +100,7 @@ var SCHEDULE = [
     ['1:00', 'Hot Hawaiian String Band', 'Outside'],
     ['2:00', 'Talent Show', 'Outside'],
     ['3:00', '2K House Band', 'Outside'],
-    ['4:00', 'Space Goat', 'Outside'],
+    ['4:00', 'Sonia Jams', 'Outside'],
     ['5:00', 'Pabsy', 'Outside', true],
     ['6:30', 'DJ Sally', 'Inside']
   ] },
@@ -111,7 +111,7 @@ var SCHEDULE = [
     ['10:00', 'Flunkyball Finals', 'Outside'],
     ['10:30', 'Litty deBungus', 'Outside', true],
     ['Midnight', 'Mezcal Lynn', 'Inside'],
-    ['12:30', 'Professor P', 'Inside'],
+    ['12:30', 'SYSTEM at musIC', 'Inside'],
     ['1:30', 'Jam Jam (a la mode)', 'Inside']
   ] }
 ];

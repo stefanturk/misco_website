@@ -405,6 +405,8 @@ body::after {
 .poster-names a:hover .sub { color: var(--band-color, var(--accent-1)); }
 /* a sub that sits inline to the right of the name instead of dropping below it */
 .poster-names a .sub.sub-side { flex-basis: auto; text-align: left; }
+/* force true lowercase inside a name (Cinzel has no lowercase — it small-caps them) */
+.band-lc { font-family: Georgia, 'Times New Roman', serif; text-transform: lowercase; font-weight: 700; }
 
 /* stage / sound / lights credits under the lineup poster */
 .lineup-credits {
