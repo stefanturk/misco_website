@@ -451,10 +451,10 @@ function sendEmail_(to, subject, html) {
     });
     var code = resp.getResponseCode();
     if (code === 200) return true;
-    Logger.log('Resend error ' + code + ': ' + resp.getContentText());
+    Logger.log('Resend error ' + code + ' for ' + toArr.join(',') + ': ' + resp.getContentText());
     return false;
   } catch (err) {
-    Logger.log('Resend exception: ' + err);
+    Logger.log('Resend exception for ' + toArr.join(',') + ': ' + err);
     return false;
   }
 }
@@ -643,6 +643,7 @@ function onOpen() {
   var ui = SpreadsheetApp.getUi();
   ui.createMenu('Misco Emails')
     .addItem('Set up / reset "Emails" tab', 'setupEmailsSheet')
+    .addItem('Check guest emails (no send)', 'checkEmails')
     .addSeparator()
     .addSubMenu(ui.createMenu('Test to ME (your real info)')
       .addItem('Welcome', 'sendWelcomeToMe')
@@ -778,13 +779,53 @@ function sendBatch_(key, label) {
     ui.ButtonSet.YES_NO);
   if (go !== ui.Button.YES) return;
 
-  var sent = 0, failed = 0;
+  var sent = 0, failures = [];
   for (var j = 0; j < recipients.length; j++) {
     var t = renderEmail_(key, recipients[j]);
     if (sendEmail_(recipients[j].email, t.subject, t.html)) sent++;
-    else failed++;
+    else failures.push((recipients[j].name || '(no name)') + ' <' + recipients[j].email + '>');
     Utilities.sleep(200); // be gentle on the API
   }
 
-  ui.alert('Done', 'Sent ' + sent + ', failed ' + failed + '.', ui.ButtonSet.OK);
+  var msg = 'Sent ' + sent + ', failed ' + failures.length + '.';
+  if (failures.length) {
+    msg += '\n\nDid NOT send to:\n' + failures.join('\n') +
+      '\n\nFix the address in the sheet, then re-send (or use "Test to ME" logic per person).';
+    Logger.log('Batch "' + label + '" failures: ' + failures.join('; '));
+  }
+  ui.alert('Done', msg, ui.ButtonSet.OK);
+}
+
+/** Basic well-formedness check — catches hand-typed typos (spaces, missing @ or TLD). */
+function looksLikeEmail_(e) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(e || '').trim());
+}
+
+/** Dry run: scan every guest's email and flag any that look malformed. No sending. */
+function checkEmails() {
+  var ui = SpreadsheetApp.getUi();
+  var guests = getGuests_();
+  var seen = {}, bad = [], checked = 0;
+  for (var i = 0; i < guests.length; i++) {
+    var raw = String(guests[i].email || '');
+    var em = raw.trim().toLowerCase();
+    if (em && seen[em]) continue;
+    if (em) seen[em] = true;
+    checked++;
+    if (!looksLikeEmail_(raw)) {
+      bad.push((guests[i].name || '(no name)') + '  →  "' + raw + '"');
+    }
+  }
+  if (!bad.length) {
+    ui.alert('Emails look OK',
+      'Checked ' + checked + ' recipient(s); every address is well-formed.\n\n' +
+      'If one still failed, open Extensions ▸ Apps Script ▸ Executions, click the send run, ' +
+      'and read the "Resend error" line — it now names the address and the reason.',
+      ui.ButtonSet.OK);
+  } else {
+    ui.alert('Found ' + bad.length + ' suspicious address(es)',
+      bad.join('\n') + '\n\nFix these in the sheet (look for spaces, a missing @, or a missing .com), ' +
+      'then re-send to them.',
+      ui.ButtonSet.OK);
+  }
 }
