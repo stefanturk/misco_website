@@ -34,7 +34,7 @@
  *    "Emails" tab  once to create it (seeds the defaults below).
  *  • In Subject/Body you can use tokens: {firstName} {arrival} {venmo} {site} and, in
  *    the Body only (each on its own line): {recap} (the guest's own RSVP details),
- *    {map} (festival map image), {schedule} (weekend schedule), {address} (venue
+ *    {map} (festival map image), {lineup} (full lineup), {schedule} (weekend schedule), {address} (venue
  *    callout), {pay} (non-musicians: "paid" confirmation if col G set, else a Venmo
  *    nudge), {musician} (load-in note shown only to musicians [col H]). Start a line with "- " for
  *    a bullet; a blank line starts a new paragraph. Branding (header/footer) is added
@@ -87,8 +87,8 @@ var BUNKS_LEFT_CELL = 'B3';   // bunks remaining → bunks close at 0 or below
 // changes. Each slot is [time, act, 'Inside'|'Outside', isHeadliner?].
 var SCHEDULE = [
   { day: 'Friday Night', sub: 'Welcome, Make Camp, Get Weird', slots: [
-    ['8:00', 'Jam (Strawberry)', 'Outside'],
-    ['9:00', 'The Real Experience', 'Outside'],
+    ['8:00', 'The Real Experience', 'Outside'],
+    ['9:00', 'Jam (Strawberry)', 'Outside'],
     ['10:00', 'Pabsy', 'Outside', true],
     ['11:30', 'DJ Nobody', 'Inside'],
     ['Midnight', 'Wabsy', 'Inside'],
@@ -96,11 +96,11 @@ var SCHEDULE = [
     ['2:00', 'Jam (Blackberry)', 'Inside']
   ] },
   { day: 'Saturday Day', sub: 'Swimming, Talent Show, Good Vibes', slots: [
-    ['Noon', 'Jam (Peach)', 'Outside'],
-    ['1:00', 'Hot Hawaiian String Band', 'Outside'],
+    ['Noon', 'Aloha Meatball', 'Outside'],
+    ['1:00', 'Jam (Peach)', 'Outside'],
     ['2:00', 'Talent Show', 'Outside'],
     ['3:00', '2K House Band', 'Outside'],
-    ['4:00', 'Sonia Jams', 'Outside'],
+    ['4:00', 'Sonia and the Sardines', 'Outside'],
     ['5:00', 'Pabsy', 'Outside', true],
     ['6:30', 'DJ Sally', 'Inside']
   ] },
@@ -146,6 +146,8 @@ var DEFAULT_EMAILS = {
       "{recap}\n" +
       "{pay}\n" +
       "{musician}\n\n" +
+      "Here's who's playing:\n" +
+      "{lineup}\n\n" +
       "Here's the lay of the land — camping, stages, bathrooms, parking:\n" +
       "{map}\n\n" +
       "See more: {site}\n" +
@@ -249,6 +251,29 @@ function scheduleHtml_() {
     '</div>';
 }
 
+/** {lineup} block: the full lineup (headliner up top), linking to the lineup page.
+ *  Mirrors lineup.html — update here if the poster changes. */
+function lineupHtml_() {
+  var page = SITE_URL + 'lineup.html';
+  var headliner = 'Trianna Feruza and the Heavy Hitters';
+  var acts = [
+    'Litty deBungus', 'Pabsy', 'Wabsy', 'Dogwater',
+    'Sonia and the Sardines', '2K House Band', 'SYSTEM at musIC', 'DJ Sally',
+    'Mezcal Lynn', 'DJ Wobert', 'The Real Experience', 'Aloha Meatball'
+  ];
+  var rest = acts.map(function (a) { return esc_(a); }).join(' &nbsp;·&nbsp; ');
+  return '' +
+    '<div style="margin:22px 0;padding:18px 20px;border:1px solid #36204f;border-radius:12px;background:#0e0a16;text-align:center;">' +
+      '<div style="font-size:12px;letter-spacing:3px;color:#ff84c4;font-weight:800;margin-bottom:12px;">THE LINEUP</div>' +
+      '<div style="font-size:20px;font-weight:800;color:#fff;line-height:1.2;">' + esc_(headliner) + '</div>' +
+      '<div style="font-size:11px;color:#9b86bf;letter-spacing:2px;text-transform:uppercase;margin:4px 0 14px;">Headliner</div>' +
+      '<div style="font-size:15px;line-height:1.9;color:#e9e1f7;">' + rest + '</div>' +
+      '<div style="margin-top:12px;font-size:13px;">' +
+        '<a href="' + page + '" style="color:#ff84c4;font-weight:bold;">See the full lineup →</a>' +
+      '</div>' +
+    '</div>';
+}
+
 /** {pay} block, for NON-musicians only (musicians get {musician} instead, no pay line):
  *  paid (col G) → a "you're all set" confirmation; not paid → a "please Venmo" nudge. */
 function payHtml_(g) {
@@ -324,6 +349,7 @@ function bodyToHtml_(text, g) {
     var trimmed = lines[i].trim();
     if (trimmed === '{recap}') { flush(); html += recapHtml_(g); continue; }
     if (trimmed === '{map}') { flush(); html += mapHtml_(); continue; }
+    if (trimmed === '{lineup}') { flush(); html += lineupHtml_(); continue; }
     if (trimmed === '{schedule}') { flush(); html += scheduleHtml_(); continue; }
     if (trimmed === '{address}') { flush(); html += addressHtml_(); continue; }
     if (trimmed === '{pay}') { flush(); html += payHtml_(g); continue; }
@@ -648,7 +674,7 @@ function setupEmailsSheet() {
   sh.activate();
   ui.alert('Ready',
     'The "Emails" tab is set up. Edit any Subject/Body cell to change what goes out — ' +
-    'no code needed. Tokens: {firstName} {arrival} {venmo} {site} {recap} {map} {schedule} {address} {pay} {musician}. ' +
+    'no code needed. Tokens: {firstName} {arrival} {venmo} {site} {recap} {map} {lineup} {schedule} {address} {pay} {musician}. ' +
     'Start a line with "- " for a bullet.',
     ui.ButtonSet.OK);
 }
@@ -672,7 +698,7 @@ function ensureEmailsSheet_(reset) {
     sh.setColumnWidth(3, 560);
     sh.getRange(2, 2, rows.length, 2).setWrap(true).setVerticalAlignment('top');
     sh.getRange(rows.length + 3, 1).setValue(
-      'Tokens: {firstName} {arrival} {venmo} {site}  ·  body-only (own line): {recap} {map} {schedule} {address} {pay} {musician}  ·  ' +
+      'Tokens: {firstName} {arrival} {venmo} {site}  ·  body-only (own line): {recap} {map} {lineup} {schedule} {address} {pay} {musician}  ·  ' +
       'start a line with "- " for a bullet  ·  blank line = new paragraph. ' +
       'The header/footer branding is added automatically.');
   }
