@@ -259,7 +259,10 @@ function lineupHtml_() {
     'SYSTEM at musIC', 'DJ Sally', 'Mezcal Lynn', 'DJ Wobert',
     'The Real Experience', 'Aloha Meatball'
   ];
-  var list = acts.map(function (a) { return esc_(a); }).join(' &nbsp;·&nbsp; ');
+  // Each name is nowrap so it never splits mid-name; lines break only between acts.
+  var list = acts.map(function (a) {
+    return '<span style="white-space:nowrap;">' + esc_(a) + '</span>';
+  }).join('<span style="color:#9b86bf;"> · </span>');
   return '' +
     '<div style="margin:22px 0;padding:18px 20px;border:1px solid #36204f;border-radius:12px;background:#0e0a16;text-align:center;">' +
       '<div style="font-size:12px;letter-spacing:3px;color:#ff84c4;font-weight:800;margin-bottom:12px;">THE LINEUP</div>' +
