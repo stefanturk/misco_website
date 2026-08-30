@@ -649,6 +649,10 @@ function onOpen() {
       .addItem('Welcome', 'sendWelcomeToMe')
       .addItem('One Month Out', 'sendOneMonthToMe')
       .addItem('One Week Out', 'sendOneWeekToMe'))
+    .addSubMenu(ui.createMenu('Send to ONE address')
+      .addItem('Welcome', 'sendWelcomeOne')
+      .addItem('One Month Out', 'sendOneMonthOne')
+      .addItem('One Week Out', 'sendOneWeekOne'))
     .addSubMenu(ui.createMenu('Send to EVERYONE')
       .addItem('Welcome', 'sendWelcomeAll')
       .addItem('One Month Out', 'sendOneMonthAll')
@@ -746,6 +750,59 @@ function sendTestToMe_(key, label) {
 function sendWelcomeAll() { sendBatch_('welcome', 'Welcome'); }
 function sendOneMonthAll() { sendBatch_('oneMonth', 'One Month Out'); }
 function sendOneWeekAll() { sendBatch_('oneWeek', 'One Week Out'); }
+
+// ── Send one template to a single address (resends, fixes, latecomers) ──────────
+function sendWelcomeOne() { sendOneAddress_('welcome', 'Welcome'); }
+function sendOneMonthOne() { sendOneAddress_('oneMonth', 'One Month Out'); }
+function sendOneWeekOne() { sendOneAddress_('oneWeek', 'One Week Out'); }
+
+/** Prompt for one email address and send the chosen template to just that person.
+ *  Matches the address to their RSVP row so recap/pay/musician come out right. */
+function sendOneAddress_(key, label) {
+  var ui = SpreadsheetApp.getUi();
+  if (!PropertiesService.getScriptProperties().getProperty('RESEND_API_KEY')) {
+    ui.alert('No RESEND_API_KEY set',
+      'Add it first: Project Settings ▸ Script Properties ▸ RESEND_API_KEY = your Resend key.',
+      ui.ButtonSet.OK);
+    return;
+  }
+
+  var resp = ui.prompt('Send "' + label + '" to one address',
+    'Type the email address:', ui.ButtonSet.OK_CANCEL);
+  if (resp.getSelectedButton() !== ui.Button.OK) return;
+  var addr = String(resp.getResponseText() || '').trim();
+  if (!looksLikeEmail_(addr)) {
+    ui.alert('That doesn\'t look like a valid email',
+      '"' + addr + '"\n\nCheck for spaces, a missing @, or a missing .com, then try again.',
+      ui.ButtonSet.OK);
+    return;
+  }
+
+  // Match to a real RSVP row so the recap/paid/musician blocks are personalized.
+  var guests = getGuests_();
+  var guest = null;
+  for (var i = 0; i < guests.length; i++) {
+    if (String(guests[i].email || '').trim().toLowerCase() === addr.toLowerCase()) { guest = guests[i]; break; }
+  }
+  if (!guest) {
+    var go = ui.alert('No RSVP row for that address',
+      'Couldn\'t find "' + addr + '" in the sheet, so recap/paid/musician details would be blank. ' +
+      'Usually you want to fix their email cell first so it matches.\n\nSend anyway?',
+      ui.ButtonSet.YES_NO);
+    if (go !== ui.Button.YES) return;
+    guest = { name: '', email: addr, bunk: '', venmo: '', arrival: '', paid: false, musician: false };
+  }
+
+  var who = guest.name ? guest.name + ' <' + addr + '>' : addr;
+  if (ui.alert('Confirm send', 'Send "' + label + '" to ' + who + '?', ui.ButtonSet.YES_NO) !== ui.Button.YES) return;
+
+  var t = renderEmail_(key, guest);
+  var ok = sendEmail_(addr, t.subject, t.html);
+  ui.alert(ok ? 'Sent' : 'Send failed',
+    ok ? '"' + label + '" went out to ' + addr + '.'
+       : 'Resend rejected it — check Extensions ▸ Apps Script ▸ Executions for the reason.',
+    ui.ButtonSet.OK);
+}
 
 function sendBatch_(key, label) {
   var ui = SpreadsheetApp.getUi();
