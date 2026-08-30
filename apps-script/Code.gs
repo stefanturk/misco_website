@@ -61,6 +61,7 @@ var FROM = 'Camp Misco <misco@littyd.com>';            // must be a Resend-verif
 // for:  var FROM = 'Camp Misco <tickets@campmisco.com>';
 var REPLY_TO = 'oodsigma28@gmail.com';                 // guest replies land here
 var FOUNDERS = ['oodsigma28@gmail.com', 'stefanturkowski@gmail.com']; // milestone recaps
+var ADMIN_ALERT = 'stefanturkowski@gmail.com';         // gets a heads-up if a signup's welcome email fails
 var SITE_URL = 'https://campmisco.com/';
 var VENMO = '@alex-youngberg';
 var VENUE_ADDRESS = '6836 Pappalardo Promenade, Murphys, CA';  // shown by the {address} block
@@ -68,6 +69,7 @@ var VENUE_ADDRESS = '6836 Pappalardo Promenade, Murphys, CA';  // shown by the {
 var SEND_WELCOME_ON_RSVP = true;          // email the guest a "ticket" the moment they RSVP
 var NOTIFY_FOUNDERS_ON_MILESTONE = true;  // email founders a recap every Nth RSVP (not every RSVP)
 var MILESTONE_EVERY = 10;                 // 10, 20, 30, … RSVPs triggers a founder recap
+var ALERT_ADMIN_ON_SIGNUP_ISSUE = true;   // email ADMIN_ALERT when a new RSVP's welcome email can't be sent
 
 // ── Live caps (read from the "Website (No Touch)" tab; auto-close at 0) ─────────
 // The spreadsheet computes what's left; we just check it's still above 0. Read
@@ -433,6 +435,31 @@ function milestoneNotifyHtml_(count, newest) {
   );
 }
 
+/** Owner heads-up: a new RSVP saved, but its welcome email couldn't be sent. */
+function notifyAdminSignupIssue_(guest, badFormat) {
+  var sheetUrl = SpreadsheetApp.getActiveSpreadsheet().getUrl();
+  var reason = badFormat
+    ? 'The email address looks malformed (likely a typo — e.g. missing ".com" or a stray space), so nothing was sent.'
+    : 'Resend rejected the send, so the welcome email did not go out.';
+  var html = wrapEmail_(
+    '<p style="margin:0 0 14px;"><strong style="color:#fff;">Heads up — a new RSVP couldn\'t be emailed.</strong></p>' +
+    '<table style="width:100%;border-collapse:collapse;font-size:14px;margin:0 0 14px;">' +
+      '<tr><td style="padding:6px 0;color:#9b86bf;width:130px;">Name</td><td style="padding:6px 0;">' + esc_(guest.name || '—') + '</td></tr>' +
+      '<tr><td style="padding:6px 0;color:#9b86bf;">Email (as entered)</td><td style="padding:6px 0;color:#fff;">' + esc_(guest.email || '—') + '</td></tr>' +
+      '<tr><td style="padding:6px 0;color:#9b86bf;">Arriving</td><td style="padding:6px 0;">' + esc_(guest.arrival || '—') + '</td></tr>' +
+    '</table>' +
+    '<p style="margin:0 0 14px;">' + esc_(reason) + '</p>' +
+    '<p style="margin:0 0 14px;">Their RSVP is saved. To fix: correct the email in the sheet, then run ' +
+      '<strong>Misco Emails ▸ Send to ONE address ▸ Welcome</strong>.</p>' +
+    '<p style="margin:0;"><a href="' + sheetUrl + '" style="color:#ff84c4;font-weight:bold;">Open the RSVP sheet →</a></p>'
+  );
+  try {
+    sendEmail_(ADMIN_ALERT, '⚠️ Camp Misco RSVP — couldn\'t email ' + (guest.name || guest.email || 'a new signup'), html);
+  } catch (e) {
+    Logger.log('admin alert failed: ' + e);
+  }
+}
+
 // ── Resend send helper ────────────────────────────────────────────────────────
 function sendEmail_(to, subject, html) {
   var key = PropertiesService.getScriptProperties().getProperty('RESEND_API_KEY');
@@ -599,11 +626,19 @@ function doPost(e) {
       '' // Notes — left blank for you to fill in
     ]);
 
-    // Emails are best-effort — a send failure must NOT fail the RSVP.
+    // Emails are best-effort — a send failure must NOT fail the RSVP, but the owner
+    // should hear about it so a typo'd address (e.g. missing ".com") isn't silently missed.
     try {
-      if (SEND_WELCOME_ON_RSVP && guest.email && guest.email.indexOf('@') !== -1) {
-        var w = renderEmail_('welcome', guest);
-        sendEmail_(guest.email, w.subject, w.html);
+      if (SEND_WELCOME_ON_RSVP) {
+        var badAddr = !looksLikeEmail_(guest.email);
+        var sentOk = false;
+        if (!badAddr) {
+          var w = renderEmail_('welcome', guest);
+          sentOk = sendEmail_(guest.email, w.subject, w.html);
+        }
+        if ((badAddr || !sentOk) && ALERT_ADMIN_ON_SIGNUP_ISSUE) {
+          notifyAdminSignupIssue_(guest, badAddr);
+        }
       }
       // Founders get a recap only when this RSVP lands on a multiple of MILESTONE_EVERY
       // (10, 20, 30, …) — not on every RSVP. RSVPs are append-only and duplicates are
