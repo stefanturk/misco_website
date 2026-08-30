@@ -251,26 +251,19 @@ function scheduleHtml_() {
     '</div>';
 }
 
-/** {lineup} block: the full lineup (headliner up top), linking to the lineup page.
- *  Mirrors lineup.html — update here if the poster changes. */
+/** {lineup} block: every act, in the same order as the lineup page. */
 function lineupHtml_() {
-  var page = SITE_URL + 'lineup.html';
-  var headliner = 'Trianna Feruza and the Heavy Hitters';
   var acts = [
-    'Litty deBungus', 'Pabsy', 'Wabsy', 'Dogwater',
-    'Sonia and the Sardines', '2K House Band', 'SYSTEM at musIC', 'DJ Sally',
-    'Mezcal Lynn', 'DJ Wobert', 'The Real Experience', 'Aloha Meatball'
+    'Litty deBungus', 'Pabsy', 'Trianna Feruza and the Heavy Hitters',
+    'Wabsy', 'Dogwater', 'Sonia and the Sardines', '2K House Band',
+    'SYSTEM at musIC', 'DJ Sally', 'Mezcal Lynn', 'DJ Wobert',
+    'The Real Experience', 'Aloha Meatball'
   ];
-  var rest = acts.map(function (a) { return esc_(a); }).join(' &nbsp;·&nbsp; ');
+  var list = acts.map(function (a) { return esc_(a); }).join(' &nbsp;·&nbsp; ');
   return '' +
     '<div style="margin:22px 0;padding:18px 20px;border:1px solid #36204f;border-radius:12px;background:#0e0a16;text-align:center;">' +
       '<div style="font-size:12px;letter-spacing:3px;color:#ff84c4;font-weight:800;margin-bottom:12px;">THE LINEUP</div>' +
-      '<div style="font-size:20px;font-weight:800;color:#fff;line-height:1.2;">' + esc_(headliner) + '</div>' +
-      '<div style="font-size:11px;color:#9b86bf;letter-spacing:2px;text-transform:uppercase;margin:4px 0 14px;">Headliner</div>' +
-      '<div style="font-size:15px;line-height:1.9;color:#e9e1f7;">' + rest + '</div>' +
-      '<div style="margin-top:12px;font-size:13px;">' +
-        '<a href="' + page + '" style="color:#ff84c4;font-weight:bold;">See the full lineup →</a>' +
-      '</div>' +
+      '<div style="font-size:15px;line-height:1.9;color:#e9e1f7;">' + list + '</div>' +
     '</div>';
 }
 
