@@ -122,7 +122,7 @@ var EMAIL_ORDER = ['welcome', 'oneMonth', 'oneWeek'];
 var DEFAULT_EMAILS = {
   welcome: {
     label: 'Welcome',
-    subject: "🪩 You're in — Camp Misco 4 (Sept 25–27) 🪩",
+    subject: "You're in — Camp Misco 4 (Sept 25–27)",
     body:
       "You're on the list, {firstName}! 🪩\n\n" +
       "Consider this your ticket. Here's the plan we've got down for you:\n\n" +
@@ -138,7 +138,7 @@ var DEFAULT_EMAILS = {
   },
   oneMonth: {
     label: 'One Month Out',
-    subject: '🪩 Camp Misco is a month away 🪩',
+    subject: 'Camp Misco is a month away',
     body:
       "Camp Misco around the corner!\n\n" +
       "- The address is 6836 Pappalardo Promenade, Murphys CA\n" +
@@ -157,7 +157,7 @@ var DEFAULT_EMAILS = {
   },
   oneWeek: {
     label: 'One Week Out',
-    subject: '🪩 Camp Misco is this week 🪩',
+    subject: 'Camp Misco is this week',
     body:
       "Camp Misco is this week, {firstName}! 🪩\n\n" +
       "Travel safe, and here's what you need:\n" +
