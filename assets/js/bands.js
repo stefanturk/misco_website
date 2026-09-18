@@ -7,18 +7,17 @@ window.MISCO_BANDS = {
   'Wabsy': '#',
   'Dogwater': '#',
   'Aloha Meatball': '#',
-  '2K House Band': 'https://2kfest.com/',
   'The Real Experience': '#',
   'Mezcal Lynn': '#',
-  'DJ Sally': '#',
   'Trianna Feruza and the Heavy Hitters': 'https://www.triannaferuza.com/',
   'Rourke': '#',
   'Sonia and the Sardines': '#',
   'SYSTEM at musIC': '#',
   'DJ Wobert': '#',
-  'DJ Nobody': '#',
   'DJ iPod': '#',
-  'Flunkyball Finals': 'https://en.wikipedia.org/wiki/Flunkyball'
+  'We bought a Keg': '#',
+  'The Real Slim Shainy': '#',
+  'DJ Sally and Flunkyball': '#'
 };
 
 (function () {

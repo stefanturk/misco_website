@@ -440,10 +440,11 @@ body::after {
   transition: box-shadow .2s ease, border-color .2s ease;
 }
 .ticket:hover { border-color: color-mix(in srgb, var(--accent-1) 55%, transparent); box-shadow: 0 0 22px color-mix(in srgb, var(--accent-1) 22%, transparent); }
-/* duration -> height (proportional, 0.5 / 1 / 1.5 hr) */
+/* duration -> height (proportional, 0.5 / 1 / 1.5 / 2 hr) */
 .ticket.dur-05 { min-height: 56px; }
 .ticket.dur-1  { min-height: 92px; }
 .ticket.dur-15 { min-height: 132px; }
+.ticket.dur-2  { min-height: 172px; }
 /* the torn stub */
 .ticket .stub {
   flex: 0 0 72px; display: flex; flex-direction: column; justify-content: center; align-items: center;
