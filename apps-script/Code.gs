@@ -181,6 +181,43 @@ function firstName_(name) {
   return n || 'there';
 }
 
+/** "A", "A and B", "A, B, and C". */
+function joinNames_(names) {
+  if (names.length <= 1) return names[0] || '';
+  if (names.length === 2) return names[0] + ' and ' + names[1];
+  return names.slice(0, -1).join(', ') + ', and ' + names[names.length - 1];
+}
+
+/** Greeting name: first names of everyone sharing the address (or just the one guest's). */
+function greetName_(g) {
+  return (g && g.firstNames && g.firstNames.length) ? joinNames_(g.firstNames) : firstName_(g && g.name);
+}
+
+/** Rows that share one email -> one guest. Details (bunk, arrival) come from the first
+ *  row; everyone must have paid to count as paid; any musician makes it a musician. */
+function mergeGuests_(rows) {
+  if (rows.length === 1) return rows[0];
+  var g = {};
+  for (var k in rows[0]) g[k] = rows[0][k];
+  g.name = rows.map(function (r) { return r.name; }).join(' & ');
+  g.firstNames = rows.map(function (r) { return firstName_(r.name); });
+  g.paid = rows.every(function (r) { return r.paid; });
+  g.musician = rows.some(function (r) { return r.musician; });
+  return g;
+}
+
+/** One merged guest per distinct valid-looking email, in sheet order. */
+function guestsByEmail_(guests) {
+  var order = [], groups = {};
+  for (var i = 0; i < guests.length; i++) {
+    var em = String(guests[i].email || '').trim().toLowerCase();
+    if (!em || em.indexOf('@') === -1) continue;
+    if (!groups[em]) { groups[em] = []; order.push(em); }
+    groups[em].push(guests[i]);
+  }
+  return order.map(function (em) { return mergeGuests_(groups[em]); });
+}
+
 /** On-brand wrapper: header + body + footer. Inline styles only (email clients). */
 function wrapEmail_(innerHtml) {
   return '' +
@@ -316,7 +353,7 @@ function addressHtml_() {
 /** Replace inline tokens inside one escaped line, then auto-link bare URLs. */
 function inlineTokens_(s, g) {
   var out = esc_(s)
-    .replace(/\{firstName\}/g, esc_(firstName_(g.name)))
+    .replace(/\{firstName\}/g, esc_(greetName_(g)))
     .replace(/\{arrival\}/g, esc_(g.arrival || 'whenever you can'))
     .replace(/\{venmo\}/g, esc_(VENMO))
     .replace(/\{site\}/g, esc_(SITE_URL));
@@ -326,7 +363,7 @@ function inlineTokens_(s, g) {
 
 function subjectTokens_(s, g) {
   return String(s || '')
-    .replace(/\{firstName\}/g, firstName_(g.name))
+    .replace(/\{firstName\}/g, greetName_(g))
     .replace(/\{arrival\}/g, g.arrival || '')
     .replace(/\{venmo\}/g, VENMO)
     .replace(/\{site\}/g, SITE_URL);
@@ -764,7 +801,7 @@ function sendTestToMe_(key, label) {
       ui.ButtonSet.OK);
     return;
   }
-  var guest = null, all = getGuests_();
+  var guest = null, all = guestsByEmail_(getGuests_());
   for (var i = 0; i < all.length; i++) {
     if (all[i].email.trim().toLowerCase() === me.toLowerCase()) { guest = all[i]; break; }
   }
@@ -814,7 +851,7 @@ function sendOneAddress_(key, label) {
   }
 
   // Match to a real RSVP row so the recap/paid/musician blocks are personalized.
-  var guests = getGuests_();
+  var guests = guestsByEmail_(getGuests_());
   var guest = null;
   for (var i = 0; i < guests.length; i++) {
     if (String(guests[i].email || '').trim().toLowerCase() === addr.toLowerCase()) { guest = guests[i]; break; }
@@ -849,17 +886,10 @@ function sendBatch_(key, label) {
     return;
   }
 
-  // De-duplicate by email (lowercased), skip rows without a valid address.
-  var seen = {};
-  var recipients = [];
-  var guests = getGuests_();
-  for (var i = 0; i < guests.length; i++) {
-    var em = guests[i].email.toLowerCase();
-    if (!em || em.indexOf('@') === -1) continue;
-    if (seen[em]) continue;
-    seen[em] = true;
-    recipients.push(guests[i]);
-  }
+  // One email per address (lowercased); people sharing an address are merged and
+  // greeted together. Rows without a valid address are skipped.
+  var recipients = guestsByEmail_(getGuests_());
+  var shared = recipients.filter(function (r) { return r.firstNames; });
 
   if (!recipients.length) {
     ui.alert('No guests with an email address yet.');
@@ -867,7 +897,10 @@ function sendBatch_(key, label) {
   }
 
   var go = ui.alert('Send "' + label + '" to EVERYONE',
-    'This emails all ' + recipients.length + ' guest(s) for real. Sent the preview to the founders first? Continue?',
+    'This emails ' + recipients.length + ' address(es) for real' +
+      (shared.length ? ' (' + shared.length + ' shared by multiple people: ' +
+        shared.map(function (r) { return joinNames_(r.firstNames); }).join('; ') + ')' : '') +
+      '. Sent the preview to the founders first? Continue?',
     ui.ButtonSet.YES_NO);
   if (go !== ui.Button.YES) return;
 
