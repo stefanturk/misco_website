@@ -89,32 +89,32 @@ var BUNKS_LEFT_CELL = 'B3';   // bunks remaining → bunks close at 0 or below
 // changes. Each slot is [time, act, 'Inside'|'Outside', isHeadliner?].
 var SCHEDULE = [
   { day: 'Friday Night', sub: 'Welcome, Make Camp, Get Weird', slots: [
+    ['6:00', 'We bought a Keg', 'Outside'],
+    ['7:00', 'Jam (Strawberry)', 'Outside'],
     ['8:00', 'The Real Experience', 'Outside'],
-    ['9:00', 'Jam (Strawberry)', 'Outside'],
-    ['10:00', 'Pabsy', 'Outside', true],
-    ['11:30', 'DJ Nobody', 'Inside'],
+    ['9:00', 'Pabsy', 'Outside', true],
+    ['11:00', 'The Real Slim Shainy', 'Outside'],
     ['Midnight', 'Wabsy', 'Inside'],
-    ['1:00', 'DJ Wobert', 'Inside'],
-    ['2:00', 'Jam (Blackberry)', 'Inside']
+    ['1:00', 'DJ Wobert', 'Inside']
   ] },
   { day: 'Saturday Day', sub: 'Swimming, Talent Show, Good Vibes', slots: [
     ['Noon', 'Aloha Meatball', 'Outside'],
     ['1:00', 'Jam (Peach)', 'Outside'],
-    ['2:00', 'Talent Show', 'Outside'],
-    ['3:00', '2K House Band', 'Outside'],
-    ['4:00', 'Sonia and the Sardines', 'Outside'],
-    ['5:00', 'Pabsy', 'Outside', true],
-    ['6:30', 'DJ Sally', 'Inside']
+    ['2:00', 'Sonia and the Sardines', 'Outside'],
+    ['3:00', 'Talent Show', 'Outside'],
+    ['3:30', 'Pabsy', 'Outside', true],
+    ['5:00', 'Flunkyball', 'Outside'],
+    ['5:30', 'Dogwater', 'Outside'],
+    ['6:30', 'DJ Sally', 'Outside']
   ] },
   { day: 'Saturday Night', sub: 'Lights, Camera, Action', slots: [
-    ['7:00', 'Dogwater', 'Outside'],
-    ['8:00', 'DJ Sally', 'Inside'],
-    ['8:30', 'Trianna Feruza and the Heavy Hitters', 'Outside', true],
-    ['10:00', 'Flunkyball Finals', 'Outside'],
-    ['10:30', 'Litty deBungus', 'Outside', true],
-    ['Midnight', 'Mezcal Lynn', 'Inside'],
-    ['12:30', 'SYSTEM at musIC', 'Inside'],
-    ['1:30', 'Jam Jam (a la mode)', 'Inside']
+    ['7:00', 'Trianna Feruza and the Heavy Hitters', 'Outside', true],
+    ['8:30', 'DJ Sally', 'Outside'],
+    ['9:00', 'Litty deBungus', 'Outside', true],
+    ['10:30', 'Mezcal Lynn', 'Outside'],
+    ['11:00', 'Rourke', 'Outside'],
+    ['Midnight', 'SYSTEM at musIC', 'Inside'],
+    ['1:00', 'Jam (Blackberry)', 'Inside']
   ] }
 ];
 
@@ -257,7 +257,7 @@ function scheduleHtml_() {
 function lineupHtml_() {
   var acts = [
     'Litty deBungus', 'Pabsy', 'Trianna Feruza and the Heavy Hitters',
-    'Wabsy', 'Dogwater', 'Sonia and the Sardines', '2K House Band',
+    'Wabsy', 'Dogwater', 'Sonia and the Sardines', 'Rourke',
     'SYSTEM at musIC', 'DJ Sally', 'Mezcal Lynn', 'DJ Wobert',
     'The Real Experience', 'Aloha Meatball'
   ];
