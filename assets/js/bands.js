@@ -17,7 +17,8 @@ window.MISCO_BANDS = {
   'DJ iPod': '#',
   'We bought a Keg': '#',
   'The Real Slim Shainy': '#',
-  'DJ Sally and Flunkyball': '#'
+  'DJ Sally': '#',
+  'Flunkyball': 'https://en.wikipedia.org/wiki/Flunkyball'
 };
 
 (function () {
